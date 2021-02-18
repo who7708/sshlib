@@ -1,4 +1,3 @@
-
 package com.trilead.ssh2.channel;
 
 /**
@@ -7,7 +6,6 @@ package com.trilead.ssh2.channel;
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: IChannelWorkerThread.java,v 1.1 2007/10/15 12:49:56 cplattne Exp $
  */
-interface IChannelWorkerThread
-{
+interface IChannelWorkerThread {
 	void stopWorking();
 }

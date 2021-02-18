@@ -1,4 +1,3 @@
-
 package com.trilead.ssh2.log;
 
 import com.trilead.ssh2.DebugLogger;
@@ -17,37 +16,34 @@ import com.trilead.ssh2.DebugLogger;
  * @version $Id: Logger.java,v 1.2 2008/03/03 07:01:36 cplattne Exp $
  */
 
-public class Logger
-{
+public class Logger {
 	public static boolean enabled = false;
 	public static DebugLogger logger = null;
 
-	private String className;
+	private final String className;
 
-	public final static Logger getLogger(Class x)
-	{
+	public final static Logger getLogger(Class x) {
 		return new Logger(x);
 	}
 
-	public Logger(Class x)
-	{
+	public Logger(Class x) {
 		this.className = x.getName();
 	}
 
-	public final boolean isEnabled()
-	{
+	public final boolean isEnabled() {
 		return enabled;
 	}
 
-	public final void log(int level, String message)
-	{
-		if (!enabled)
+	public final void log(int level, String message) {
+		if (!enabled) {
 			return;
+		}
 
 		DebugLogger target = logger;
 
-		if (target == null)
+		if (target == null) {
 			return;
+		}
 
 		target.log(level, className, message);
 	}

@@ -198,7 +198,8 @@ public class KnownHostsTest {
 				equalTo("ecdsa-sha2-nistp384"),
 				equalTo("ecdsa-sha2-nistp521"),
 				equalTo("ssh-dss")
-			));	}
+			));
+	}
 
 	@Test
 	public void getPreferredServerHostkeyAlgorithmOrder_Unknown() throws Exception {

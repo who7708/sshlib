@@ -27,10 +27,14 @@ import static org.mockito.Mockito.when;
 
 @RunWith(value = MockitoJUnitRunner.class)
 public class KexManagerTest {
-	@Mock private TransportManager tm;
-	@Mock private ClientServerHello csh;
-	@Mock private ServerHostKeyVerifier keyVerifier;
-	@Mock private SecureRandom rnd;
+	@Mock
+	private TransportManager tm;
+	@Mock
+	private ClientServerHello csh;
+	@Mock
+	private ServerHostKeyVerifier keyVerifier;
+	@Mock
+	private SecureRandom rnd;
 	private final CryptoWishList initialCwl = new CryptoWishList();
 
 	private KexManager kexManager;
@@ -70,7 +74,7 @@ public class KexManagerTest {
 
 	@Test(expected = IOException.class)
 	public void handlePacket_BeforeKex_NotKexInit_ThrowsException() throws Exception {
-		kexManager.handleMessage(new byte[] {Packets.SSH_MSG_NEWKEYS}, 1);
+		kexManager.handleMessage(new byte[]{Packets.SSH_MSG_NEWKEYS}, 1);
 	}
 
 	public static class PacketTypeMatcher extends TypeSafeMatcher<byte[]> {
@@ -118,7 +122,7 @@ public class KexManagerTest {
 	@Test(expected = IOException.class)
 	public void handlePacket_KexInit_NonMatchingProposals() throws Exception {
 		PacketKexInit packetKexInit = new PacketKexInit(new CryptoWishList());
-		packetKexInit.getKexParameters().kex_algorithms = new String[] { "non-existent" };
+		packetKexInit.getKexParameters().kex_algorithms = new String[]{"non-existent"};
 		byte[] payload = packetKexInit.getPayload();
 		kexManager.handleMessage(payload, payload.length);
 	}
@@ -138,6 +142,6 @@ public class KexManagerTest {
 		kexManager.handleMessage(payload, payload.length);
 
 		// If this weren't ignored, it would throw an exception
-		kexManager.handleMessage(new byte[] { Packets.SSH_MSG_NEWKEYS }, 1);
+		kexManager.handleMessage(new byte[]{Packets.SSH_MSG_NEWKEYS}, 1);
 	}
 }

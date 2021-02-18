@@ -3,7 +3,6 @@ package com.trilead.ssh2.signature;
 import com.trilead.ssh2.crypto.PEMDecoder;
 import org.junit.Test;
 
-
 /**
  * Created by kenny on 12/25/15.
  */

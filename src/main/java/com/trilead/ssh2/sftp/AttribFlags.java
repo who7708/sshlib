@@ -1,23 +1,20 @@
-
 package com.trilead.ssh2.sftp;
 
 /**
- *
  * Attribute Flags. The 'valid-attribute-flags' field in
  * the SFTP ATTRS data type specifies which of the fields are actually present.
  *
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: AttribFlags.java,v 1.1 2007/10/15 12:49:55 cplattne Exp $
- *
  */
-public class AttribFlags
-{
+public class AttribFlags {
 	/**
 	 * Indicates that the 'allocation-size' field is present.
 	 */
 	public static final int SSH_FILEXFER_ATTR_SIZE = 0x00000001;
 
-	/** Protocol version 6:
+	/**
+	 * Protocol version 6:
 	 * 0x00000002 was used in a previous version of this protocol.
 	 * It is now a reserved value and MUST NOT appear in the mask.
 	 * Some future version of this protocol may reuse this value.

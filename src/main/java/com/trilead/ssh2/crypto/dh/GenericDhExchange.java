@@ -1,13 +1,11 @@
-
 package com.trilead.ssh2.crypto.dh;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 
 import com.trilead.ssh2.crypto.digest.HashForSSH2Types;
 import com.trilead.ssh2.log.Logger;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 
 /**
  * DhExchange.
@@ -15,16 +13,14 @@ import com.trilead.ssh2.log.Logger;
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: DhExchange.java,v 1.2 2008/04/01 12:38:09 cplattne Exp $
  */
-public abstract class GenericDhExchange
-{
+public abstract class GenericDhExchange {
 	private static final Logger log = Logger.getLogger(GenericDhExchange.class);
 
 	/* Shared secret */
 
 	BigInteger sharedSecret;
 
-	protected GenericDhExchange()
-	{
+	protected GenericDhExchange() {
 	}
 
 	public static GenericDhExchange getInstance(String algo) {
@@ -56,10 +52,10 @@ public abstract class GenericDhExchange
 	 * @return Returns the shared secret k.
 	 * @throws IllegalStateException
 	 */
-	public BigInteger getK()
-	{
-		if (sharedSecret == null)
+	public BigInteger getK() {
+		if (sharedSecret == null) {
 			throw new IllegalStateException("Shared secret not yet known, need f first!");
+		}
 
 		return sharedSecret;
 	}
@@ -70,12 +66,10 @@ public abstract class GenericDhExchange
 	public abstract void setF(byte[] f) throws IOException;
 
 	public byte[] calculateH(byte[] clientversion, byte[] serverversion, byte[] clientKexPayload,
-			byte[] serverKexPayload, byte[] hostKey) throws UnsupportedEncodingException
-	{
+							 byte[] serverKexPayload, byte[] hostKey) throws UnsupportedEncodingException {
 		HashForSSH2Types hash = new HashForSSH2Types(getHashAlgo());
 
-		if (log.isEnabled())
-		{
+		if (log.isEnabled()) {
 			log.log(90, "Client: '" + new String(clientversion) + "'");
 			log.log(90, "Server: '" + new String(serverversion) + "'");
 		}

@@ -1,5 +1,8 @@
 package com.trilead.ssh2.crypto.dh;
 
+import com.trilead.ssh2.signature.ECDSASHA2Verify;
+
+import javax.crypto.KeyAgreement;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -15,13 +18,8 @@ import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 
-import javax.crypto.KeyAgreement;
-
-import com.trilead.ssh2.signature.ECDSASHA2Verify;
-
 /**
  * @author kenny
- *
  */
 public class EcDhExchange extends GenericDhExchange {
 	private ECPrivateKey clientPrivate;
@@ -59,20 +57,21 @@ public class EcDhExchange extends GenericDhExchange {
 	@Override
 	public byte[] getE() {
 		return ECDSASHA2Verify.encodeECPoint(clientPublic.getW(), clientPublic.getParams()
-				.getCurve());
+			.getCurve());
 	}
 
 	@Override
 	protected byte[] getServerE() {
 		return ECDSASHA2Verify.encodeECPoint(serverPublic.getW(), serverPublic.getParams()
-				.getCurve());
+			.getCurve());
 	}
 
 	@Override
 	public void setF(byte[] f) throws IOException {
 
-		if (clientPublic == null)
+		if (clientPublic == null) {
 			throw new IllegalStateException("DhDsaExchange not initialized!");
+		}
 
 		final KeyAgreement ka;
 		try {
@@ -85,7 +84,7 @@ public class EcDhExchange extends GenericDhExchange {
 			ECPoint serverPoint = verifier.decodeECPoint(f);
 			ECParameterSpec params = verifier.getParameterSpec();
 			this.serverPublic = (ECPublicKey) kf.generatePublic(new ECPublicKeySpec(serverPoint,
-																					params));
+				params));
 
 			ka = KeyAgreement.getInstance("ECDH");
 			ka.init(clientPrivate);

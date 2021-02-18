@@ -1,8 +1,6 @@
-
 package com.trilead.ssh2.sftp;
 
 /**
- *
  * SFTP Attribute Bits for the "attrib-bits" and "attrib-bits-valid" fields
  * of the SFTP ATTR data type.
  * <p>
@@ -17,10 +15,8 @@ package com.trilead.ssh2.sftp;
  *
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: AttribBits.java,v 1.1 2007/10/15 12:49:55 cplattne Exp $
- *
  */
-public class AttribBits
-{
+public class AttribBits {
 	/**
 	 * Advisory, read-only bit. This bit is not part of the access
 	 * control information on the file, but is rather an advisory field

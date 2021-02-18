@@ -36,8 +36,8 @@ public class DropbearCompatibilityTest {
 	private static final String USERNAME = "testuser";
 	private static final String PASSWORD = "testtest123";
 
-	private static ImageFromDockerfile baseImage = new ImageFromDockerfile("dropbear-server", false)
-			.withFileFromClasspath(".", "dropbear-server");
+	private static final ImageFromDockerfile baseImage = new ImageFromDockerfile("dropbear-server", false)
+		.withFileFromClasspath(".", "dropbear-server");
 
 	static {
 		for (String key : PubkeyConstants.KEY_NAMES) {
@@ -56,9 +56,9 @@ public class DropbearCompatibilityTest {
 
 	private static GenericContainer getBaseContainer() {
 		return new GenericContainer(baseImage)
-				.withLogConsumer(logConsumer)
-				.waitingFor(new LogMessageWaitStrategy()
-						.withRegEx(".*Not backgrounding.*\\s"));
+			.withLogConsumer(logConsumer)
+			.waitingFor(new LogMessageWaitStrategy()
+				.withRegEx(".*Not backgrounding.*\\s"));
 	}
 
 	private ConnectionInfo assertCanPasswordAuthenticate(GenericContainer server) throws IOException {
@@ -165,7 +165,7 @@ public class DropbearCompatibilityTest {
 
 	private void assertCanConnectToServerWithKex(@NotNull String kexType) throws IOException {
 		ConnectionInfo info = connectToServer(
-				c -> c.setKeyExchangeAlgorithms(new String[]{kexType}));
+			c -> c.setKeyExchangeAlgorithms(new String[]{kexType}));
 		assertThat(info.keyExchangeAlgorithm, is(kexType));
 	}
 

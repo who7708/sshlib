@@ -1,7 +1,6 @@
 package com.trilead.ssh2.crypto.dh;
 
 import com.google.crypto.tink.subtle.X25519;
-
 import org.junit.Test;
 
 import java.math.BigInteger;

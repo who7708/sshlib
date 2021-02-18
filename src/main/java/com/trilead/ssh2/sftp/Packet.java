@@ -1,16 +1,12 @@
-
 package com.trilead.ssh2.sftp;
 
 /**
- *
  * SFTP Paket Types
  *
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: Packet.java,v 1.1 2007/10/15 12:49:55 cplattne Exp $
- *
  */
-public class Packet
-{
+public class Packet {
 	public static final int SSH_FXP_INIT = 1;
 	public static final int SSH_FXP_VERSION = 2;
 	public static final int SSH_FXP_OPEN = 3;

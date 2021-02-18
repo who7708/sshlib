@@ -7,8 +7,7 @@ package com.trilead.ssh2.auth;
 import java.io.IOException;
 import java.security.PublicKey;
 
-public abstract class SignatureProxy
-{
+public abstract class SignatureProxy {
 	public static final String SHA1 = "SHA-1";
 	public static final String SHA256 = "SHA-256";
 	public static final String SHA384 = "SHA-384";
@@ -17,7 +16,7 @@ public abstract class SignatureProxy
 	/**
 	 * Holds the public key which belongs to the private key which is used in the signing process.
 	 */
-	private PublicKey mPublicKey;
+	private final PublicKey mPublicKey;
 
 	/**
 	 * Instantiates a new SignatureProxy which needs a public key for the
@@ -26,10 +25,8 @@ public abstract class SignatureProxy
 	 * @param publicKey The public key.
 	 * @throws IllegalArgumentException Might be thrown id the public key is invalid.
 	 */
-	public SignatureProxy(PublicKey publicKey)
-	{
-		if (publicKey == null)
-		{
+	public SignatureProxy(PublicKey publicKey) {
+		if (publicKey == null) {
 			throw new IllegalArgumentException("Public key must not be null");
 		}
 		mPublicKey = publicKey;
@@ -38,15 +35,14 @@ public abstract class SignatureProxy
 	/**
 	 * This method should sign a given byte array message using the private key.
 	 *
-	 * @param message The message which should be signed.
+	 * @param message       The message which should be signed.
 	 * @param hashAlgorithm The hashing algorithm which should be used.
 	 * @return The signed message.
 	 * @throws IOException This exception might be thrown during the signing process.
 	 */
 	public abstract byte[] sign(byte[] message, String hashAlgorithm) throws IOException;
 
-	public PublicKey getPublicKey()
-	{
+	public PublicKey getPublicKey() {
 		return mPublicKey;
 	}
 }

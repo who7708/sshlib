@@ -35,7 +35,7 @@ public class OpenSSHCompatibilityTest {
 
 	private static final ImageFromDockerfile baseImage = new ImageFromDockerfile(
 		"openssh-server", false)
-				.withFileFromClasspath(".", "openssh-server");
+		.withFileFromClasspath(".", "openssh-server");
 
 	static {
 		for (String key : PubkeyConstants.KEY_NAMES) {
@@ -43,7 +43,7 @@ public class OpenSSHCompatibilityTest {
 		}
 	}
 
-	private ExtendedServerHostKeyVerifier verifier = new TestExtendedHostKeyVerifier();
+	private final ExtendedServerHostKeyVerifier verifier = new TestExtendedHostKeyVerifier();
 
 	@NotNull
 	@Contract("_ -> new")
@@ -53,10 +53,10 @@ public class OpenSSHCompatibilityTest {
 
 	private static GenericContainer<?> getBaseContainer() {
 		return new GenericContainer<>(baseImage)
-				.withExposedPorts(22)
-				.withLogConsumer(logConsumer)
-				.waitingFor(new LogMessageWaitStrategy()
-						.withRegEx(".*Server listening on .*\\s"));
+			.withExposedPorts(22)
+			.withLogConsumer(logConsumer)
+			.waitingFor(new LogMessageWaitStrategy()
+				.withRegEx(".*Server listening on .*\\s"));
 	}
 
 	private ConnectionInfo assertCanPasswordAuthenticate(GenericContainer<?> server) throws IOException {
@@ -291,7 +291,7 @@ public class OpenSSHCompatibilityTest {
 	@Test
 	public void canConnectWithCompression() throws Exception {
 		try (GenericContainer<?> server = getBaseContainer()
-				.withEnv(OPTIONS_ENV, "-oCompression=yes")) {
+			.withEnv(OPTIONS_ENV, "-oCompression=yes")) {
 			server.start();
 			try (Connection c = withServer(server)) {
 				c.setCompression(true);

@@ -1,8 +1,6 @@
-
 package com.trilead.ssh2.sftp;
 
 /**
- *
  * Permissions for the 'permissions' field in the SFTP ATTRS data type.
  * <p>
  * "<i>The 'permissions' field contains a bit mask specifying file permissions.
@@ -11,10 +9,8 @@ package com.trilead.ssh2.sftp;
  *
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: AttribPermissions.java,v 1.1 2007/10/15 12:49:55 cplattne Exp $
- *
  */
-public class AttribPermissions
-{
+public class AttribPermissions {
 	/* Octal values! */
 
 	public static final int S_IRUSR = 0400;

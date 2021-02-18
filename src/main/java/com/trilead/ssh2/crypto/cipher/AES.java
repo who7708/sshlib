@@ -1,4 +1,3 @@
-
 package com.trilead.ssh2.crypto.cipher;
 
 import javax.crypto.Cipher;
@@ -13,8 +12,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * AES modes for SSH using the JCE.
  */
-public abstract class AES implements BlockCipher
-{
+public abstract class AES implements BlockCipher {
 	private final int AES_BLOCK_SIZE = 16;
 
 	protected Cipher cipher;
@@ -23,8 +21,8 @@ public abstract class AES implements BlockCipher
 	public void init(boolean forEncryption, byte[] key, byte[] iv) {
 		try {
 			cipher.init(forEncryption ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE,
-					new SecretKeySpec(key, "AES"),
-					new IvParameterSpec(iv));
+				new SecretKeySpec(key, "AES"),
+				new IvParameterSpec(iv));
 		} catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
 			throw new IllegalArgumentException("Cannot initialize " + cipher.getAlgorithm(), e);
 		}

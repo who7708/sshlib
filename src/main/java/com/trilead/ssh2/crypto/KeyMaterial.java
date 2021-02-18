@@ -1,10 +1,8 @@
-
 package com.trilead.ssh2.crypto;
 
+import com.trilead.ssh2.crypto.digest.HashForSSH2Types;
 
 import java.math.BigInteger;
-
-import com.trilead.ssh2.crypto.digest.HashForSSH2Types;
 
 /**
  * Establishes key material for iv/key/mac (both directions).
@@ -12,8 +10,7 @@ import com.trilead.ssh2.crypto.digest.HashForSSH2Types;
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: KeyMaterial.java,v 1.1 2007/10/15 12:49:56 cplattne Exp $
  */
-public class KeyMaterial
-{
+public class KeyMaterial {
 	public byte[] initial_iv_client_to_server;
 	public byte[] initial_iv_server_to_client;
 	public byte[] enc_key_client_to_server;
@@ -22,8 +19,7 @@ public class KeyMaterial
 	public byte[] integrity_key_server_to_client;
 
 	private static byte[] calculateKey(HashForSSH2Types sh, BigInteger K, byte[] H, byte type, byte[] SessionID,
-			int keyLength)
-	{
+									   int keyLength) {
 		byte[] res = new byte[keyLength];
 
 		int dglen = sh.getDigestLength();
@@ -47,13 +43,13 @@ public class KeyMaterial
 		keyLength -= produced;
 		off += produced;
 
-		for (int i = 1; i < numRounds; i++)
-		{
+		for (int i = 1; i < numRounds; i++) {
 			sh.updateBigInt(K);
 			sh.updateBytes(H);
 
-			for (int j = 0; j < i; j++)
+			for (int j = 0; j < i; j++) {
 				sh.updateBytes(tmp[j]);
+			}
 
 			tmp[i] = sh.getDigest();
 
@@ -67,9 +63,8 @@ public class KeyMaterial
 	}
 
 	public static KeyMaterial create(String hashAlgo, byte[] H, BigInteger K, byte[] SessionID, int keyLengthCS,
-			int blockSizeCS, int macLengthCS, int keyLengthSC, int blockSizeSC, int macLengthSC)
-			throws IllegalArgumentException
-	{
+									 int blockSizeCS, int macLengthCS, int keyLengthSC, int blockSizeSC, int macLengthSC)
+		throws IllegalArgumentException {
 		KeyMaterial km = new KeyMaterial();
 
 		HashForSSH2Types sh = new HashForSSH2Types(hashAlgo);

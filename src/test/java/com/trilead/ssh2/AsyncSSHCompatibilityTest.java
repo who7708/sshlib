@@ -37,15 +37,15 @@ public class AsyncSSHCompatibilityTest {
 
 	static {
 		ImageFromDockerfile baseImage = new ImageFromDockerfile("asyncssh-server", false)
-				.withFileFromClasspath(".", "asyncssh-server");
+			.withFileFromClasspath(".", "asyncssh-server");
 		for (String key : PubkeyConstants.KEY_NAMES) {
 			baseImage.withFileFromClasspath(key, "com/trilead/ssh2/crypto/" + key);
 		}
 
 		server = new GenericContainer(baseImage)
-				.withLogConsumer(new Slf4jLogConsumer(logger).withPrefix("DOCKER"))
-				.waitingFor(new LogMessageWaitStrategy()
-						.withRegEx(".*LISTENER READY.*\\s"));
+			.withLogConsumer(new Slf4jLogConsumer(logger).withPrefix("DOCKER"))
+			.waitingFor(new LogMessageWaitStrategy()
+				.withRegEx(".*LISTENER READY.*\\s"));
 	}
 
 	@NotNull

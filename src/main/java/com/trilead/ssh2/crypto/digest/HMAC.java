@@ -1,4 +1,3 @@
-
 package com.trilead.ssh2.crypto.digest;
 
 import javax.crypto.Mac;
@@ -13,8 +12,7 @@ import java.security.NoSuchAlgorithmException;
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: MAC.java,v 1.1 2007/10/15 12:49:57 cplattne Exp $
  */
-public final class HMAC implements MAC
-{
+public final class HMAC implements MAC {
 	private static final String ETM_SUFFIX = "-etm@openssh.com";
 
 	/**
@@ -67,46 +65,32 @@ public final class HMAC implements MAC
 	private final boolean encryptThenMac;
 	private final byte[] buffer;
 
-	public HMAC(String type, byte[] key)
-	{
+	public HMAC(String type, byte[] key) {
 		try {
-			if (HMAC_SHA1.equals(type) || HMAC_SHA1_96.equals(type))
-			{
+			if (HMAC_SHA1.equals(type) || HMAC_SHA1_96.equals(type)) {
 				mac = Mac.getInstance("HmacSHA1");
 				encryptThenMac = false;
-			}
-			else if (HMAC_SHA1_ETM.equals(type))
-			{
+			} else if (HMAC_SHA1_ETM.equals(type)) {
 				mac = Mac.getInstance("HmacSHA1");
 				encryptThenMac = true;
-			}
-			else if (HMAC_MD5.equals(type) || HMAC_MD5_96.equals(type))
-			{
+			} else if (HMAC_MD5.equals(type) || HMAC_MD5_96.equals(type)) {
 				mac = Mac.getInstance("HmacMD5");
 				encryptThenMac = false;
-			}
-			else if (HMAC_SHA2_256.equals(type))
-			{
+			} else if (HMAC_SHA2_256.equals(type)) {
 				mac = Mac.getInstance("HmacSHA256");
 				encryptThenMac = false;
-			}
-			else if (HMAC_SHA2_256_ETM.equals(type))
-			{
+			} else if (HMAC_SHA2_256_ETM.equals(type)) {
 				mac = Mac.getInstance("HmacSHA256");
 				encryptThenMac = true;
-			}
-			else if (HMAC_SHA2_512.equals(type))
-			{
+			} else if (HMAC_SHA2_512.equals(type)) {
 				mac = Mac.getInstance("HmacSHA512");
 				encryptThenMac = false;
-			}
-			else if (HMAC_SHA2_512_ETM.equals(type))
-			{
+			} else if (HMAC_SHA2_512_ETM.equals(type)) {
 				mac = Mac.getInstance("HmacSHA512");
 				encryptThenMac = true;
-			}
-			else
+			} else {
 				throw new IllegalArgumentException("Unknown algorithm " + type);
+			}
 		} catch (NoSuchAlgorithmException e) {
 			throw new IllegalArgumentException("Unknown algorithm " + type, e);
 		}
@@ -127,8 +111,7 @@ public final class HMAC implements MAC
 		}
 	}
 
-	public final void initMac(int seq)
-	{
+	public final void initMac(int seq) {
 		mac.reset();
 		mac.update((byte) (seq >> 24));
 		mac.update((byte) (seq >> 16));
@@ -136,13 +119,11 @@ public final class HMAC implements MAC
 		mac.update((byte) (seq));
 	}
 
-	public final void update(byte[] packetdata, int off, int len)
-	{
+	public final void update(byte[] packetdata, int off, int len) {
 		mac.update(packetdata, off, len);
 	}
 
-	public final void getMac(byte[] out, int off)
-	{
+	public final void getMac(byte[] out, int off) {
 		try {
 			if (buffer != null) {
 				mac.doFinal(buffer, 0);
@@ -155,8 +136,7 @@ public final class HMAC implements MAC
 		}
 	}
 
-	public final int size()
-	{
+	public final int size() {
 		return outSize;
 	}
 

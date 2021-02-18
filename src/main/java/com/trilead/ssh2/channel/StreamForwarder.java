@@ -1,4 +1,3 @@
-
 package com.trilead.ssh2.channel;
 
 import java.io.IOException;
@@ -15,8 +14,7 @@ import java.net.Socket;
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: StreamForwarder.java,v 1.1 2007/10/15 12:49:56 cplattne Exp $
  */
-public class StreamForwarder extends Thread
-{
+public class StreamForwarder extends Thread {
 	final OutputStream os;
 	final InputStream is;
 	final byte[] buffer = new byte[Channel.CHANNEL_BUFFER_SIZE];
@@ -34,76 +32,50 @@ public class StreamForwarder extends Thread
 		this.s = s;
 	}
 
-	public void run()
-	{
-		try
-		{
-			while (true)
-			{
+	public void run() {
+		try {
+			while (true) {
 				int len = is.read(buffer);
-				if (len <= 0)
+				if (len <= 0) {
 					break;
+				}
 				os.write(buffer, 0, len);
 				os.flush();
 			}
-		}
-		catch (IOException ignore)
-		{
-			try
-			{
+		} catch (IOException ignore) {
+			try {
 				c.cm.closeChannel(c, "Closed due to exception in StreamForwarder (" + mode + "): "
-						+ ignore.getMessage(), true);
+					+ ignore.getMessage(), true);
+			} catch (IOException e) {
 			}
-			catch (IOException e)
-			{
-			}
-		}
-		finally
-		{
-			try
-			{
+		} finally {
+			try {
 				os.close();
+			} catch (IOException e1) {
 			}
-			catch (IOException e1)
-			{
-			}
-			try
-			{
+			try {
 				is.close();
-			}
-			catch (IOException e2)
-			{
+			} catch (IOException e2) {
 			}
 
-			if (sibling != null)
-			{
-				while (sibling.isAlive())
-				{
-					try
-					{
+			if (sibling != null) {
+				while (sibling.isAlive()) {
+					try {
 						sibling.join();
-					}
-					catch (InterruptedException e)
-					{
+					} catch (InterruptedException e) {
 					}
 				}
 
-				try
-				{
+				try {
 					c.cm.closeChannel(c, "StreamForwarder (" + mode + ") is cleaning up the connection", true);
-				}
-				catch (IOException e3)
-				{
+				} catch (IOException e3) {
 				}
 			}
 
 			if (s != null) {
-				try
-				{
+				try {
 					s.close();
-				}
-				catch (IOException e1)
-				{
+				} catch (IOException e1) {
 				}
 			}
 		}

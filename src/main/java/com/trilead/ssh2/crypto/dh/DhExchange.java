@@ -27,7 +27,7 @@ public class DhExchange extends GenericDhExchange {
 	/* Given by the standard */
 
 	private static final BigInteger P1 = new BigInteger(
-			"FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1" +
+		"FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1" +
 			"29024E088A67CC74020BBEA63B139B22514A08798E3404DD" +
 			"EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245" +
 			"E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7ED" +
@@ -35,7 +35,7 @@ public class DhExchange extends GenericDhExchange {
 			"FFFFFFFFFFFFFFFF", 16);
 
 	private static final BigInteger P14 = new BigInteger(
-			"FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1" +
+		"FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1" +
 			"29024E088A67CC74020BBEA63B139B22514A08798E3404DD" +
 			"EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245" +
 			"E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7ED" +
@@ -48,7 +48,7 @@ public class DhExchange extends GenericDhExchange {
 			"15728E5A8AACAA68FFFFFFFFFFFFFFFF", 16);
 
 	private static final BigInteger P16 = new BigInteger(
-			"FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1" +
+		"FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1" +
 			"29024E088A67CC74020BBEA63B139B22514A08798E3404DD" +
 			"EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245" +
 			"E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7ED" +
@@ -72,7 +72,7 @@ public class DhExchange extends GenericDhExchange {
 			"FFFFFFFFFFFFFFFF", 16);
 
 	private static final BigInteger P18 = new BigInteger(
-			"FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1" +
+		"FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1" +
 			"29024E088A67CC74020BBEA63B139B22514A08798E3404DD" +
 			"EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245" +
 			"E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7ED" +
@@ -167,31 +167,34 @@ public class DhExchange extends GenericDhExchange {
 
 	@Override
 	public byte[] getE() {
-		if (clientPublic == null)
+		if (clientPublic == null) {
 			throw new IllegalStateException("DhExchange not initialized!");
+		}
 
 		return clientPublic.getY().toByteArray();
 	}
 
 	@Override
 	protected byte[] getServerE() {
-		if (serverPublic == null)
+		if (serverPublic == null) {
 			throw new IllegalStateException("DhExchange not initialized!");
+		}
 
 		return serverPublic.getY().toByteArray();
 	}
 
 	@Override
 	public void setF(byte[] f) throws IOException {
-		if (clientPublic == null)
+		if (clientPublic == null) {
 			throw new IllegalStateException("DhExchange not initialized!");
+		}
 
 		final KeyAgreement ka;
 		try {
 			KeyFactory kf = KeyFactory.getInstance("DH");
 			DHParameterSpec params = clientPublic.getParams();
 			this.serverPublic = (DHPublicKey) kf.generatePublic(new DHPublicKeySpec(
-					new BigInteger(1, f), params.getP(), params.getG()));
+				new BigInteger(1, f), params.getP(), params.getG()));
 
 			ka = KeyAgreement.getInstance("DH");
 			ka.init(clientPrivate);

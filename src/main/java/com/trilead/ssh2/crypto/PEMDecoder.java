@@ -1,11 +1,24 @@
-
 package com.trilead.ssh2.crypto;
+
+import com.trilead.ssh2.crypto.cipher.AES;
+import com.trilead.ssh2.crypto.cipher.BlockCipher;
+import com.trilead.ssh2.crypto.cipher.DES;
+import com.trilead.ssh2.crypto.cipher.DESede;
+import com.trilead.ssh2.crypto.keys.Ed25519PrivateKey;
+import com.trilead.ssh2.crypto.keys.Ed25519PublicKey;
+import com.trilead.ssh2.packets.TypesReader;
+import com.trilead.ssh2.signature.DSASHA1Verify;
+import com.trilead.ssh2.signature.ECDSASHA2Verify;
+import com.trilead.ssh2.signature.Ed25519Verify;
+import com.trilead.ssh2.signature.RSASHA1Verify;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.DigestException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -27,68 +40,50 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Arrays;
 import java.util.Locale;
 
-import com.trilead.ssh2.crypto.cipher.AES;
-import com.trilead.ssh2.crypto.cipher.BlockCipher;
-import com.trilead.ssh2.crypto.cipher.DES;
-import com.trilead.ssh2.crypto.cipher.DESede;
-import com.trilead.ssh2.crypto.keys.Ed25519PrivateKey;
-import com.trilead.ssh2.crypto.keys.Ed25519PublicKey;
-import com.trilead.ssh2.packets.TypesReader;
-import com.trilead.ssh2.signature.DSASHA1Verify;
-import com.trilead.ssh2.signature.ECDSASHA2Verify;
-import com.trilead.ssh2.signature.Ed25519Verify;
-import com.trilead.ssh2.signature.RSASHA1Verify;
-import org.mindrot.jbcrypt.BCrypt;
-
 /**
  * PEM Support.
  *
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: PEMDecoder.java,v 1.2 2008/04/01 12:38:09 cplattne Exp $
  */
-public class PEMDecoder
-{
+public class PEMDecoder {
 	public static final int PEM_RSA_PRIVATE_KEY = 1;
 	public static final int PEM_DSA_PRIVATE_KEY = 2;
 	public static final int PEM_EC_PRIVATE_KEY = 3;
 	public static final int PEM_OPENSSH_PRIVATE_KEY = 4;
 
-	private static final byte[] OPENSSH_V1_MAGIC = new byte[] {
+	private static final byte[] OPENSSH_V1_MAGIC = new byte[]{
 		'o', 'p', 'e', 'n', 's', 's', 'h', '-', 'k', 'e', 'y', '-', 'v', '1', '\0',
 	};
 
-	private static int hexToInt(char c)
-	{
-		if ((c >= 'a') && (c <= 'f'))
-		{
+	private static int hexToInt(char c) {
+		if ((c >= 'a') && (c <= 'f')) {
 			return (c - 'a') + 10;
 		}
 
-		if ((c >= 'A') && (c <= 'F'))
-		{
+		if ((c >= 'A') && (c <= 'F')) {
 			return (c - 'A') + 10;
 		}
 
-		if ((c >= '0') && (c <= '9'))
-		{
+		if ((c >= '0') && (c <= '9')) {
 			return (c - '0');
 		}
 
 		throw new IllegalArgumentException("Need hex char");
 	}
 
-	private static byte[] hexToByteArray(String hex)
-	{
-		if (hex == null)
+	private static byte[] hexToByteArray(String hex) {
+		if (hex == null) {
 			throw new IllegalArgumentException("null argument");
+		}
 
-		if ((hex.length() % 2) != 0)
+		if ((hex.length() % 2) != 0) {
 			throw new IllegalArgumentException("Uneven string length in hex encoding.");
+		}
 
-		byte decoded[] = new byte[hex.length() / 2];
+		byte[] decoded = new byte[hex.length() / 2];
 
-		for (int i = 0; i < decoded.length; i++)
-		{
+		for (int i = 0; i < decoded.length; i++) {
 			int hi = hexToInt(hex.charAt(i * 2));
 			int lo = hexToInt(hex.charAt((i * 2) + 1));
 
@@ -99,10 +94,10 @@ public class PEMDecoder
 	}
 
 	private static byte[] generateKeyFromPasswordSaltWithMD5(byte[] password, byte[] salt, int keyLen)
-			throws IOException
-	{
-		if (salt.length < 8)
+		throws IOException {
+		if (salt.length < 8) {
 			throw new IllegalArgumentException("Salt needs to be at least 8 bytes for key generation.");
+		}
 
 		MessageDigest md5;
 		try {
@@ -114,8 +109,7 @@ public class PEMDecoder
 		byte[] key = new byte[keyLen];
 		byte[] tmp = new byte[md5.getDigestLength()];
 
-		while (true)
-		{
+		while (true) {
 			md5.update(password, 0, password.length);
 			md5.update(salt, 0, 8); // ARGH we only use the first 8 bytes of the
 			// salt in this step.
@@ -133,26 +127,27 @@ public class PEMDecoder
 
 			keyLen -= copy;
 
-			if (keyLen == 0)
+			if (keyLen == 0) {
 				return key;
+			}
 
 			md5.update(tmp, 0, tmp.length);
 		}
 	}
 
-	private static byte[] removePadding(byte[] buff, int blockSize) throws IOException
-	{
+	private static byte[] removePadding(byte[] buff, int blockSize) throws IOException {
 		/* Removes RFC 1423/PKCS #7 padding */
 
 		int rfc_1423_padding = buff[buff.length - 1] & 0xff;
 
-		if ((rfc_1423_padding < 1) || (rfc_1423_padding > blockSize))
+		if ((rfc_1423_padding < 1) || (rfc_1423_padding > blockSize)) {
 			throw new IOException("Decrypted PEM has wrong padding, did you specify the correct password?");
+		}
 
-		for (int i = 2; i <= rfc_1423_padding; i++)
-		{
-			if (buff[buff.length - i] != rfc_1423_padding)
+		for (int i = 2; i <= rfc_1423_padding; i++) {
+			if (buff[buff.length - i] != rfc_1423_padding) {
 				throw new IOException("Decrypted PEM has wrong padding, did you specify the correct password?");
+			}
 		}
 
 		byte[] tmp = new byte[buff.length - rfc_1423_padding];
@@ -160,8 +155,7 @@ public class PEMDecoder
 		return tmp;
 	}
 
-	public static final PEMStructure parsePEM(char[] pem) throws IOException
-	{
+	public static final PEMStructure parsePEM(char[] pem) throws IOException {
 		PEMStructure ps = new PEMStructure();
 
 		String line = null;
@@ -170,24 +164,22 @@ public class PEMDecoder
 
 		String endLine = null;
 
-		while (true)
-		{
+		while (true) {
 			line = br.readLine();
 
-			if (line == null)
+			if (line == null) {
 				throw new IOException("Invalid PEM structure, '-----BEGIN...' missing");
+			}
 
 			line = line.trim();
 
-			if (line.startsWith("-----BEGIN DSA PRIVATE KEY-----"))
-			{
+			if (line.startsWith("-----BEGIN DSA PRIVATE KEY-----")) {
 				endLine = "-----END DSA PRIVATE KEY-----";
 				ps.pemType = PEM_DSA_PRIVATE_KEY;
 				break;
 			}
 
-			if (line.startsWith("-----BEGIN RSA PRIVATE KEY-----"))
-			{
+			if (line.startsWith("-----BEGIN RSA PRIVATE KEY-----")) {
 				endLine = "-----END RSA PRIVATE KEY-----";
 				ps.pemType = PEM_RSA_PRIVATE_KEY;
 				break;
@@ -206,39 +198,39 @@ public class PEMDecoder
 			}
 		}
 
-		while (true)
-		{
+		while (true) {
 			line = br.readLine();
 
-			if (line == null)
+			if (line == null) {
 				throw new IOException("Invalid PEM structure, " + endLine + " missing");
+			}
 
 			line = line.trim();
 
 			int sem_idx = line.indexOf(':');
 
-			if (sem_idx == -1)
+			if (sem_idx == -1) {
 				break;
+			}
 
 			String name = line.substring(0, sem_idx + 1);
 			String value = line.substring(sem_idx + 1);
 
-			String values[] = value.split(",");
+			String[] values = value.split(",");
 
-			for (int i = 0; i < values.length; i++)
+			for (int i = 0; i < values.length; i++) {
 				values[i] = values[i].trim();
+			}
 
 			// Proc-Type: 4,ENCRYPTED
 			// DEK-Info: DES-EDE3-CBC,579B6BE3E5C60483
 
-			if ("Proc-Type:".equals(name))
-			{
+			if ("Proc-Type:".equals(name)) {
 				ps.procType = values;
 				continue;
 			}
 
-			if ("DEK-Info:".equals(name))
-			{
+			if ("DEK-Info:".equals(name)) {
 				ps.dekInfo = values;
 				continue;
 			}
@@ -247,15 +239,16 @@ public class PEMDecoder
 
 		StringBuffer keyData = new StringBuffer();
 
-		while (true)
-		{
-			if (line == null)
+		while (true) {
+			if (line == null) {
 				throw new IOException("Invalid PEM structure, " + endLine + " missing");
+			}
 
 			line = line.trim();
 
-			if (line.startsWith(endLine))
+			if (line.startsWith(endLine)) {
 				break;
+			}
 
 			keyData.append(line);
 
@@ -267,69 +260,49 @@ public class PEMDecoder
 
 		ps.data = Base64.decode(pem_chars);
 
-		if (ps.data.length == 0)
+		if (ps.data.length == 0) {
 			throw new IOException("Invalid PEM structure, no data available");
+		}
 
 		return ps;
 	}
 
-	private static byte[] decryptData(byte[] data, byte[] pw, byte[] salt, int rounds, String algo) throws IOException
-	{
+	private static byte[] decryptData(byte[] data, byte[] pw, byte[] salt, int rounds, String algo) throws IOException {
 		BlockCipher bc;
 		int keySize;
 
 		String algoLower = algo.toLowerCase(Locale.US);
-		if (algoLower.equals("des-ede3-cbc"))
-		{
+		if (algoLower.equals("des-ede3-cbc")) {
 			bc = new DESede.CBC();
 			keySize = 24;
-		}
-		else if (algoLower.equals("des-cbc"))
-		{
+		} else if (algoLower.equals("des-cbc")) {
 			bc = new DES.CBC();
 			keySize = 8;
-		}
-		else if (algoLower.equals("aes-128-cbc") || algoLower.equals("aes128-cbc"))
-		{
+		} else if (algoLower.equals("aes-128-cbc") || algoLower.equals("aes128-cbc")) {
 			bc = new AES.CBC();
 			keySize = 16;
-		}
-		else if (algoLower.equals("aes-192-cbc") || algoLower.equals("aes192-cbc"))
-		{
+		} else if (algoLower.equals("aes-192-cbc") || algoLower.equals("aes192-cbc")) {
 			bc = new AES.CBC();
 			keySize = 24;
-		}
-		else if (algoLower.equals("aes-256-cbc") || algoLower.equals("aes256-cbc"))
-		{
+		} else if (algoLower.equals("aes-256-cbc") || algoLower.equals("aes256-cbc")) {
 			bc = new AES.CBC();
 			keySize = 32;
-		}
-		else if (algoLower.equals("aes-128-ctr") || algoLower.equals("aes128-ctr"))
-		{
+		} else if (algoLower.equals("aes-128-ctr") || algoLower.equals("aes128-ctr")) {
 			bc = new AES.CTR();
 			keySize = 16;
-		}
-		else if (algoLower.equals("aes-192-ctr") || algoLower.equals("aes192-ctr"))
-		{
+		} else if (algoLower.equals("aes-192-ctr") || algoLower.equals("aes192-ctr")) {
 			bc = new AES.CTR();
 			keySize = 24;
-		}
-		else if (algoLower.equals("aes-256-ctr") || algoLower.equals("aes256-ctr"))
-		{
+		} else if (algoLower.equals("aes-256-ctr") || algoLower.equals("aes256-ctr")) {
 			bc = new AES.CTR();
 			keySize = 32;
-		}
-		else
-		{
+		} else {
 			throw new IOException("Cannot decrypt PEM structure, unknown cipher " + algo);
 		}
 
-		if (rounds == -1)
-		{
+		if (rounds == -1) {
 			bc.init(false, generateKeyFromPasswordSaltWithMD5(pw, salt, keySize), salt);
-		}
-		else
-		{
+		} else {
 			byte[] key = new byte[keySize];
 			byte[] iv = new byte[bc.getBlockSize()];
 
@@ -343,16 +316,15 @@ public class PEMDecoder
 			bc.init(false, key, iv);
 		}
 
-
-		if ((data.length % bc.getBlockSize()) != 0)
+		if ((data.length % bc.getBlockSize()) != 0) {
 			throw new IOException("Invalid PEM structure, size of encrypted block is not a multiple of "
-					+ bc.getBlockSize());
+				+ bc.getBlockSize());
+		}
 
 		/* Now decrypt the content */
 		byte[] dz = new byte[data.length];
 
-		for (int i = 0; i < data.length / bc.getBlockSize(); i++)
-		{
+		for (int i = 0; i < data.length / bc.getBlockSize(); i++) {
 			bc.transformBlock(data, i * bc.getBlockSize(), dz, i * bc.getBlockSize());
 		}
 
@@ -365,13 +337,14 @@ public class PEMDecoder
 		}
 	}
 
-	private static void decryptPEM(PEMStructure ps, byte[] pw) throws IOException
-	{
-		if (ps.dekInfo == null)
+	private static void decryptPEM(PEMStructure ps, byte[] pw) throws IOException {
+		if (ps.dekInfo == null) {
 			throw new IOException("Broken PEM, no mode and salt given, but encryption enabled");
+		}
 
-		if (ps.dekInfo.length != 2)
+		if (ps.dekInfo.length != 2) {
 			throw new IOException("Broken PEM, DEK-Info is incomplete!");
+		}
 
 		String algo = ps.dekInfo[0];
 		byte[] salt = hexToByteArray(ps.dekInfo[1]);
@@ -383,8 +356,7 @@ public class PEMDecoder
 		ps.procType = null;
 	}
 
-	public static final boolean isPEMEncrypted(PEMStructure ps) throws IOException
-	{
+	public static final boolean isPEMEncrypted(PEMStructure ps) throws IOException {
 		if (ps.pemType == PEM_OPENSSH_PRIVATE_KEY) {
 			TypesReader tr = new TypesReader(ps.data);
 			byte[] magic = tr.readBytes(OPENSSH_V1_MAGIC.length);
@@ -397,54 +369,56 @@ public class PEMDecoder
 			return !"none".equals(kdfname);
 		}
 
-		if (ps.procType == null)
+		if (ps.procType == null) {
 			return false;
+		}
 
-		if (ps.procType.length != 2)
+		if (ps.procType.length != 2) {
 			throw new IOException("Unknown Proc-Type field.");
+		}
 
-		if (!"4".equals(ps.procType[0]))
+		if (!"4".equals(ps.procType[0])) {
 			throw new IOException("Unknown Proc-Type field (" + ps.procType[0] + ")");
+		}
 
 		return "ENCRYPTED".equals(ps.procType[1]);
 
 	}
 
-	public static KeyPair decode(char[] pem, String password) throws IOException
-	{
+	public static KeyPair decode(char[] pem, String password) throws IOException {
 		PEMStructure ps = parsePEM(pem);
 		return decode(ps, password);
 	}
 
-	public static KeyPair decode(PEMStructure ps, String password) throws IOException
-	{
-		if (isPEMEncrypted(ps) && ps.pemType != PEM_OPENSSH_PRIVATE_KEY)
-		{
-			if (password == null)
+	public static KeyPair decode(PEMStructure ps, String password) throws IOException {
+		if (isPEMEncrypted(ps) && ps.pemType != PEM_OPENSSH_PRIVATE_KEY) {
+			if (password == null) {
 				throw new IOException("PEM is encrypted, but no password was specified");
+			}
 
 			try {
-				decryptPEM(ps, password.getBytes("ISO-8859-1"));
+				decryptPEM(ps, password.getBytes(StandardCharsets.ISO_8859_1));
 			} catch (UnsupportedEncodingException e) {
-				decryptPEM(ps, password.getBytes("ISO-8859-1"));
+				decryptPEM(ps, password.getBytes(StandardCharsets.ISO_8859_1));
 			}
 		}
 
-		if (ps.pemType == PEM_DSA_PRIVATE_KEY)
-		{
+		if (ps.pemType == PEM_DSA_PRIVATE_KEY) {
 			SimpleDERReader dr = new SimpleDERReader(ps.data);
 
 			byte[] seq = dr.readSequenceAsByteArray();
 
-			if (dr.available() != 0)
+			if (dr.available() != 0) {
 				throw new IOException("Padding in DSA PRIVATE KEY DER stream.");
+			}
 
 			dr.resetInput(seq);
 
 			BigInteger version = dr.readInt();
 
-			if (version.compareTo(BigInteger.ZERO) != 0)
+			if (version.compareTo(BigInteger.ZERO) != 0) {
 				throw new IOException("Wrong version (" + version + ") in DSA PRIVATE KEY DER stream.");
+			}
 
 			BigInteger p = dr.readInt();
 			BigInteger q = dr.readInt();
@@ -452,8 +426,9 @@ public class PEMDecoder
 			BigInteger y = dr.readInt();
 			BigInteger x = dr.readInt();
 
-			if (dr.available() != 0)
+			if (dr.available() != 0) {
 				throw new IOException("Padding in DSA PRIVATE KEY DER stream.");
+			}
 
 			DSAPrivateKeySpec privSpec = new DSAPrivateKeySpec(x, p, q, g);
 			DSAPublicKeySpec pubSpec = new DSAPublicKeySpec(y, p, q, g);
@@ -461,21 +436,22 @@ public class PEMDecoder
 			return generateKeyPair("DSA", privSpec, pubSpec);
 		}
 
-		if (ps.pemType == PEM_RSA_PRIVATE_KEY)
-		{
+		if (ps.pemType == PEM_RSA_PRIVATE_KEY) {
 			SimpleDERReader dr = new SimpleDERReader(ps.data);
 
 			byte[] seq = dr.readSequenceAsByteArray();
 
-			if (dr.available() != 0)
+			if (dr.available() != 0) {
 				throw new IOException("Padding in RSA PRIVATE KEY DER stream.");
+			}
 
 			dr.resetInput(seq);
 
 			BigInteger version = dr.readInt();
 
-			if ((version.compareTo(BigInteger.ZERO) != 0) && (version.compareTo(BigInteger.ONE) != 0))
+			if ((version.compareTo(BigInteger.ZERO) != 0) && (version.compareTo(BigInteger.ONE) != 0)) {
 				throw new IOException("Wrong version (" + version + ") in RSA PRIVATE KEY DER stream.");
+			}
 
 			BigInteger n = dr.readInt();
 			BigInteger e = dr.readInt();
@@ -498,15 +474,17 @@ public class PEMDecoder
 
 			byte[] seq = dr.readSequenceAsByteArray();
 
-			if (dr.available() != 0)
+			if (dr.available() != 0) {
 				throw new IOException("Padding in EC PRIVATE KEY DER stream.");
+			}
 
 			dr.resetInput(seq);
 
 			BigInteger version = dr.readInt();
 
-			if ((version.compareTo(BigInteger.ONE) != 0))
+			if ((version.compareTo(BigInteger.ONE) != 0)) {
 				throw new IOException("Wrong version (" + version + ") in EC PRIVATE KEY DER stream.");
+			}
 
 			byte[] privateBytes = dr.readOctetString();
 
@@ -516,18 +494,19 @@ public class PEMDecoder
 				int type = dr.readConstructedType();
 				SimpleDERReader cr = dr.readConstructed();
 				switch (type) {
-				case 0:
-					curveOid = cr.readOid();
-					break;
-				case 1:
-					publicBytes = cr.readOctetString();
-					break;
+					case 0:
+						curveOid = cr.readOid();
+						break;
+					case 1:
+						publicBytes = cr.readOctetString();
+						break;
 				}
 			}
 
 			ECDSASHA2Verify verifier = ECDSASHA2Verify.getVerifierForOID(curveOid);
-			if (verifier == null)
+			if (verifier == null) {
 				throw new IOException("invalid OID");
+			}
 
 			BigInteger s = new BigInteger(1, privateBytes);
 			byte[] publicBytesSlice = new byte[publicBytes.length - 1];
@@ -572,11 +551,7 @@ public class PEMDecoder
 				byte[] salt = optionsReader.readByteString();
 				int rounds = optionsReader.readUINT32();
 				byte[] passwordBytes;
-				try {
-					passwordBytes = password.getBytes("UTF-8");
-				} catch (UnsupportedEncodingException e) {
-					passwordBytes = password.getBytes();
-				}
+				passwordBytes = password.getBytes(StandardCharsets.UTF_8);
 				dataBytes = decryptData(dataBytes, passwordBytes, salt, rounds, ciphername);
 			} else if (!"none".equals(ciphername) || !"none".equals(kdfname)) {
 				throw new IOException("encryption not supported");
@@ -598,7 +573,7 @@ public class PEMDecoder
 				byte[] publicBytes = trEnc.readByteString();
 				byte[] privateBytes = trEnc.readByteString();
 				PrivateKey privKey = new Ed25519PrivateKey(
-						Arrays.copyOfRange(privateBytes, 0, 32));
+					Arrays.copyOfRange(privateBytes, 0, 32));
 				PublicKey pubKey = new Ed25519PublicKey(publicBytes);
 				keyPair = new KeyPair(pubKey, privKey);
 			} else if (keyType.startsWith("ecdsa-sha2-")) {
@@ -681,7 +656,7 @@ public class PEMDecoder
 	 * Generate a {@code KeyPair} given an {@code algorithm} and {@code KeySpec}.
 	 */
 	private static KeyPair generateKeyPair(String algorithm, KeySpec privSpec, KeySpec pubSpec)
-			throws IOException {
+		throws IOException {
 		try {
 			final KeyFactory kf = KeyFactory.getInstance(algorithm);
 			final PublicKey pubKey = kf.generatePublic(pubSpec);

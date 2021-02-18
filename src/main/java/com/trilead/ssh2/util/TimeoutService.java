@@ -1,13 +1,11 @@
-
 package com.trilead.ssh2.util;
+
+import com.trilead.ssh2.log.Logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.LinkedList;
-
-import com.trilead.ssh2.log.Logger;
-
 
 /**
  * TimeoutService (beta). Here you can register a timeout.
@@ -20,42 +18,35 @@ import com.trilead.ssh2.log.Logger;
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: TimeoutService.java,v 1.1 2007/10/15 12:49:57 cplattne Exp $
  */
-public class TimeoutService
-{
+public class TimeoutService {
 	private static final Logger log = Logger.getLogger(TimeoutService.class);
 
-	public static class TimeoutToken implements Comparable
-	{
-		private long runTime;
-		private Runnable handler;
+	public static class TimeoutToken implements Comparable {
+		private final long runTime;
+		private final Runnable handler;
 
-		private TimeoutToken(long runTime, Runnable handler)
-		{
+		private TimeoutToken(long runTime, Runnable handler) {
 			this.runTime = runTime;
 			this.handler = handler;
 		}
 
-		public int compareTo(Object o)
-		{
+		public int compareTo(Object o) {
 			TimeoutToken t = (TimeoutToken) o;
-			if (runTime > t.runTime)
+			if (runTime > t.runTime) {
 				return 1;
-			if (runTime == t.runTime)
+			}
+			if (runTime == t.runTime) {
 				return 0;
+			}
 			return -1;
 		}
 	}
 
-	private static class TimeoutThread extends Thread
-	{
-		public void run()
-		{
-			synchronized (todolist)
-			{
-				while (true)
-				{
-					if (todolist.size() == 0)
-					{
+	private static class TimeoutThread extends Thread {
+		public void run() {
+			synchronized (todolist) {
+				while (true) {
+					if (todolist.size() == 0) {
 						timeoutThread = null;
 						return;
 					}
@@ -64,16 +55,12 @@ public class TimeoutService
 
 					TimeoutToken tt = (TimeoutToken) todolist.getFirst();
 
-					if (tt.runTime > now)
-					{
+					if (tt.runTime > now) {
 						/* Not ready yet, sleep a little bit */
 
-						try
-						{
+						try {
 							todolist.wait(tt.runTime - now);
-						}
-						catch (InterruptedException e)
-						{
+						} catch (InterruptedException e) {
 						}
 
 						/* We cannot simply go on, since it could be that the token
@@ -86,12 +73,9 @@ public class TimeoutService
 
 					todolist.removeFirst();
 
-					try
-					{
+					try {
 						tt.handler.run();
-					}
-					catch (Exception e)
-					{
+					} catch (Exception e) {
 						StringWriter sw = new StringWriter();
 						e.printStackTrace(new PrintWriter(sw));
 						log.log(20, "Exeception in Timeout handler:" + e.getMessage() + "(" + sw.toString() + ")");
@@ -113,19 +97,16 @@ public class TimeoutService
 	 * @param handler
 	 * @return a TimeoutToken that can be used to cancel the timeout.
 	 */
-	public static final TimeoutToken addTimeoutHandler(long runTime, Runnable handler)
-	{
+	public static final TimeoutToken addTimeoutHandler(long runTime, Runnable handler) {
 		TimeoutToken token = new TimeoutToken(runTime, handler);
 
-		synchronized (todolist)
-		{
+		synchronized (todolist) {
 			todolist.add(token);
 			Collections.sort(todolist);
 
-			if (timeoutThread != null)
+			if (timeoutThread != null) {
 				timeoutThread.interrupt();
-			else
-			{
+			} else {
 				timeoutThread = new TimeoutThread();
 				timeoutThread.setDaemon(true);
 				timeoutThread.start();
@@ -135,14 +116,13 @@ public class TimeoutService
 		return token;
 	}
 
-	public static final void cancelTimeoutHandler(TimeoutToken token)
-	{
-		synchronized (todolist)
-		{
+	public static final void cancelTimeoutHandler(TimeoutToken token) {
+		synchronized (todolist) {
 			todolist.remove(token);
 
-			if (timeoutThread != null)
+			if (timeoutThread != null) {
 				timeoutThread.interrupt();
+			}
 		}
 	}
 

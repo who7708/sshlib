@@ -1,16 +1,12 @@
-
 package com.trilead.ssh2.sftp;
 
 /**
- *
  * Values for the 'text-hint' field in the SFTP ATTRS data type.
  *
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: AttrTextHints.java,v 1.1 2007/10/15 12:49:55 cplattne Exp $
- *
  */
-public class AttrTextHints
-{
+public class AttrTextHints {
 	/**
 	 * The server knows the file is a text file, and should be opened
 	 * using the SSH_FXF_ACCESS_TEXT_MODE flag.

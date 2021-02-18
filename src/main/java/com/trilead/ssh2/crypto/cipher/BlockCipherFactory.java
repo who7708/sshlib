@@ -1,4 +1,3 @@
-
 package com.trilead.ssh2.crypto.cipher;
 
 import java.lang.reflect.Constructor;
@@ -10,17 +9,14 @@ import java.util.ArrayList;
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: BlockCipherFactory.java,v 1.2 2008/04/01 12:38:09 cplattne Exp $
  */
-public class BlockCipherFactory
-{
-	private static class CipherEntry
-	{
+public class BlockCipherFactory {
+	private static class CipherEntry {
 		final String type;
 		final int blocksize;
 		final int keysize;
 		final String cipherClass;
 
-		CipherEntry(String type, int blockSize, int keySize, String cipherClass)
-		{
+		CipherEntry(String type, int blockSize, int keySize, String cipherClass) {
 			this.type = type;
 			this.blocksize = blockSize;
 			this.keysize = keySize;
@@ -30,8 +26,7 @@ public class BlockCipherFactory
 
 	private static final ArrayList<CipherEntry> ciphers = new ArrayList<>();
 
-	static
-	{
+	static {
 		/* Higher Priority First */
 
 		ciphers.add(new CipherEntry("aes256-ctr", 16, 32, "com.trilead.ssh2.crypto.cipher.AES$CTR"));
@@ -46,57 +41,49 @@ public class BlockCipherFactory
 		ciphers.add(new CipherEntry("3des-cbc", 8, 24, "com.trilead.ssh2.crypto.cipher.DESede$CBC"));
 	}
 
-	public static String[] getDefaultCipherList()
-	{
-		String list[] = new String[ciphers.size()];
-		for (int i = 0; i < ciphers.size(); i++)
-		{
+	public static String[] getDefaultCipherList() {
+		String[] list = new String[ciphers.size()];
+		for (int i = 0; i < ciphers.size(); i++) {
 			CipherEntry ce = ciphers.get(i);
 			list[i] = ce.type;
 		}
 		return list;
 	}
 
-	public static void checkCipherList(String[] cipherCandidates)
-	{
-		for (String cipherCandidate : cipherCandidates)
+	public static void checkCipherList(String[] cipherCandidates) {
+		for (String cipherCandidate : cipherCandidates) {
 			getEntry(cipherCandidate);
+		}
 	}
 
-	public static BlockCipher createCipher(String type, boolean encrypt, byte[] key, byte[] iv)
-	{
-		try
-		{
+	public static BlockCipher createCipher(String type, boolean encrypt, byte[] key, byte[] iv) {
+		try {
 			CipherEntry ce = getEntry(type);
 			Class cc = Class.forName(ce.cipherClass);
 			Constructor<BlockCipher> constructor = cc.getConstructor();
 			BlockCipher bc = constructor.newInstance();
 			bc.init(encrypt, key, iv);
 			return bc;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			throw new IllegalArgumentException("Cannot instantiate " + type, e);
 		}
 	}
 
-	private static CipherEntry getEntry(String type)
-	{
+	private static CipherEntry getEntry(String type) {
 		for (CipherEntry ce : ciphers) {
-			if (ce.type.equals(type))
+			if (ce.type.equals(type)) {
 				return ce;
+			}
 		}
 		throw new IllegalArgumentException("Unknown algorithm " + type);
 	}
 
-	public static int getBlockSize(String type)
-	{
+	public static int getBlockSize(String type) {
 		CipherEntry ce = getEntry(type);
 		return ce.blocksize;
 	}
 
-	public static int getKeySize(String type)
-	{
+	public static int getKeySize(String type) {
 		CipherEntry ce = getEntry(type);
 		return ce.keysize;
 	}

@@ -12,10 +12,10 @@ public abstract class AESTest {
 	// Vectors from:
 	// https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/AES_Core_All.pdf
 	static final byte[] csrcPlaintext = toBytes(
-			"6BC1BEE22E409F96E93D7E117393172A" +
-					"AE2D8A571E03AC9C9EB76FAC45AF8E51" +
-					"30C81C46A35CE411E5FBC1191A0A52EF" +
-					"F69F2445DF4F9B17AD2B417BE66C3710");
+		"6BC1BEE22E409F96E93D7E117393172A" +
+			"AE2D8A571E03AC9C9EB76FAC45AF8E51" +
+			"30C81C46A35CE411E5FBC1191A0A52EF" +
+			"F69F2445DF4F9B17AD2B417BE66C3710");
 
 	abstract BlockCipher getCipher(boolean forEncrypt, byte[] iv, byte[] key);
 

@@ -1,4 +1,3 @@
-
 package com.trilead.ssh2.channel;
 
 /**
@@ -7,8 +6,7 @@ package com.trilead.ssh2.channel;
  * @author Christian Plattner, plattner@trilead.com
  * @version $Id: Channel.java,v 1.1 2007/10/15 12:49:56 cplattne Exp $
  */
-public class Channel
-{
+public class Channel {
 	/*
 	 * OK. Here is an important part of the JVM Specification:
 	 * (http://java.sun.com/docs/books/vmspec/2nd-edition/html/Threads.doc.html#22214)
@@ -143,8 +141,7 @@ public class Channel
 	private final Object reasonClosedLock = new Object();
 	private String reasonClosed = null;
 
-	public Channel(ChannelManager cm)
-	{
+	public Channel(ChannelManager cm) {
 		this.cm = cm;
 
 		this.localWindow = CHANNEL_BUFFER_SIZE;
@@ -157,51 +154,41 @@ public class Channel
 
 	/* Methods to allow access from classes outside of this package */
 
-	public ChannelInputStream getStderrStream()
-	{
+	public ChannelInputStream getStderrStream() {
 		return stderrStream;
 	}
 
-	public ChannelOutputStream getStdinStream()
-	{
+	public ChannelOutputStream getStdinStream() {
 		return stdinStream;
 	}
 
-	public ChannelInputStream getStdoutStream()
-	{
+	public ChannelInputStream getStdoutStream() {
 		return stdoutStream;
 	}
 
-	public String getExitSignal()
-	{
-		synchronized (this)
-		{
+	public String getExitSignal() {
+		synchronized (this) {
 			return exit_signal;
 		}
 	}
 
-	public Integer getExitStatus()
-	{
-		synchronized (this)
-		{
+	public Integer getExitStatus() {
+		synchronized (this) {
 			return exit_status;
 		}
 	}
 
-	public String getReasonClosed()
-	{
-		synchronized (reasonClosedLock)
-		{
+	public String getReasonClosed() {
+		synchronized (reasonClosedLock) {
 			return reasonClosed;
 		}
 	}
 
-	public void setReasonClosed(String reasonClosed)
-	{
-		synchronized (reasonClosedLock)
-		{
-			if (this.reasonClosed == null)
+	public void setReasonClosed(String reasonClosed) {
+		synchronized (reasonClosedLock) {
+			if (this.reasonClosed == null) {
 				this.reasonClosed = reasonClosed;
+			}
 		}
 	}
 }

@@ -21,7 +21,7 @@ public class TypesReaderTest {
 
 	@Test
 	public void constructorArrayOffset_Success() throws Exception {
-		TypesReader tr = new TypesReader(new byte[] { 0x01, 0x02, 0x03 }, 1);
+		TypesReader tr = new TypesReader(new byte[]{0x01, 0x02, 0x03}, 1);
 		assertThat(tr.remain(), equalTo(2));
 		assertThat(tr.readByte(), equalTo(0x02));
 		assertThat(tr.remain(), equalTo(1));
@@ -29,50 +29,50 @@ public class TypesReaderTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void constructorArrayOffset_NegativeOffset_Failure() {
-		new TypesReader(new byte[] { 0x01, 0x02, 0x03 }, -1);
+		new TypesReader(new byte[]{0x01, 0x02, 0x03}, -1);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void constructorArrayOffset_OffsetBeyondEnd_Failure() {
-		new TypesReader(new byte[] { 0x01, 0x02, 0x03 }, 4);
+		new TypesReader(new byte[]{0x01, 0x02, 0x03}, 4);
 	}
 
 	@Test
 	public void constructorArrayOffsetLength_Success() throws Exception {
 		TypesReader tr = new TypesReader(
-			new byte[] { 0x01, 0x02, 0x03 }, 2, 1);
+			new byte[]{0x01, 0x02, 0x03}, 2, 1);
 		assertThat(tr.remain(), equalTo(1));
 		assertThat(tr.readByte(), equalTo(0x03));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void constructorArrayOffsetLength_OffsetBeyondEnd_Failure() {
-		new TypesReader(new byte[] { 0x01, 0x02, 0x03 }, 3, 1);
+		new TypesReader(new byte[]{0x01, 0x02, 0x03}, 3, 1);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void constructorArrayOffsetLength_NegativeOffset_Failure() {
-		new TypesReader(new byte[] { 0x01, 0x02, 0x03 }, -1, 1);
+		new TypesReader(new byte[]{0x01, 0x02, 0x03}, -1, 1);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void constructorArrayOffsetLength_PositionPastEnd_Failure() {
-		new TypesReader(new byte[] { 0x01, 0x02, 0x03 }, 3, 0);
+		new TypesReader(new byte[]{0x01, 0x02, 0x03}, 3, 0);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void constructorArrayOffsetLength_NegativeOffsetLengthTooLong_Failure() {
-		new TypesReader(new byte[] { 0x01, 0x02, 0x03 }, -1, 4);
+		new TypesReader(new byte[]{0x01, 0x02, 0x03}, -1, 4);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void constructorArrayOffsetLength_LengthTooLong_Failure() {
-		new TypesReader(new byte[] { 0x01, 0x02, 0x03 }, 0, 4);
+		new TypesReader(new byte[]{0x01, 0x02, 0x03}, 0, 4);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void constructorArrayOffsetLength_NegativeLength_Failure() {
-		new TypesReader(new byte[] { 0x01, 0x02, 0x03 }, 0, -1);
+		new TypesReader(new byte[]{0x01, 0x02, 0x03}, 0, -1);
 	}
 
 	@Test
@@ -111,14 +111,14 @@ public class TypesReaderTest {
 	public void readByteString_SingleByte_Success() throws Exception {
 		assertThat(
 			readerOf(0x00, 0x00, 0x00, 0x01, 0x05).readByteString(),
-			equalTo(new byte[] { 0x05 }));
+			equalTo(new byte[]{0x05}));
 	}
 
 	@Test
 	public void readByteString_FiveBytes_Success() throws Exception {
 		assertThat(
 			readerOf(0x00, 0x00, 0x00, 0x05, 0x01, 0x50, 0x11, (byte) 0xff, 0x00).readByteString(),
-			equalTo(new byte[] { 0x01, 0x50, 0x11, (byte) 0xff, 0x00 }));
+			equalTo(new byte[]{0x01, 0x50, 0x11, (byte) 0xff, 0x00}));
 	}
 
 	@Test(expected = IOException.class)
@@ -126,25 +126,23 @@ public class TypesReaderTest {
 		readerOf().readByteString();
 	}
 
-
 	@Test(expected = IOException.class)
 	public void readByteString_LengthTooLong_Failure() throws Exception {
 		readerOf(0x00, 0x00, 0x00, 0x02, 0x01).readByteString();
 	}
 
-
 	@Test
 	public void readBytes_SingleByte_Success() throws Exception {
 		assertThat(
 			readerOf(0xaa).readBytes(1),
-			equalTo(new byte[] { (byte) 0xaa }));
+			equalTo(new byte[]{(byte) 0xaa}));
 	}
 
 	@Test
 	public void readBytes_FiveBytes_Success() throws Exception {
 		assertThat(
 			readerOf(0x01, 0x50, 0x11, (byte) 0xff, 0x00).readBytes(5),
-			equalTo(new byte[] { 0x01, 0x50, 0x11, (byte) 0xff, 0x00 }));
+			equalTo(new byte[]{0x01, 0x50, 0x11, (byte) 0xff, 0x00}));
 	}
 
 	@Test(expected = IOException.class)
@@ -174,7 +172,7 @@ public class TypesReaderTest {
 		byte[] output = new byte[3];
 		readerOf(0x19).readBytes(output, 1, 1);
 		assertThat(output,
-			equalTo(new byte[] { 0x00, (byte) 0x19, 0x00}));
+			equalTo(new byte[]{0x00, (byte) 0x19, 0x00}));
 	}
 
 	@Test
@@ -183,13 +181,13 @@ public class TypesReaderTest {
 		readerOf(0x19, 0x00, 0xFF, 0xAA, 0x5a).readBytes(output, 0, 5);
 		assertThat(
 			output,
-			equalTo(new byte[] { 0x19, 0x00, (byte) 0xFF, (byte) 0xAA, 0x5a }));
+			equalTo(new byte[]{0x19, 0x00, (byte) 0xFF, (byte) 0xAA, 0x5a}));
 	}
 
 	@Test(expected = IOException.class)
 	public void readBytes_BII_PacketTooShort_Failure() throws Exception {
 		readerOf().readBytes(new byte[12], 0, 1);
-	};
+	}
 
 	@Test(expected = IOException.class)
 	public void readBytes_BII_NegativeOFFSET_Failure() throws Exception {

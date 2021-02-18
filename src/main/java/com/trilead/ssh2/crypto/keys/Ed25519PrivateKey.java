@@ -3,16 +3,15 @@ package com.trilead.ssh2.crypto.keys;
 import com.trilead.ssh2.packets.TypesReader;
 import com.trilead.ssh2.packets.TypesWriter;
 
+import javax.security.auth.DestroyFailedException;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;
 
-import javax.security.auth.DestroyFailedException;
-
 public class Ed25519PrivateKey implements PrivateKey {
-	private static final byte[] ED25519_OID = new byte[] {43, 101, 112};
+	private static final byte[] ED25519_OID = new byte[]{43, 101, 112};
 	private static final int KEY_BYTES_LENGTH = 32;
 	private static final int ENCODED_SIZE = 48;
 

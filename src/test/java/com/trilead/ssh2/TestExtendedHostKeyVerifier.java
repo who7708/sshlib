@@ -15,8 +15,9 @@ public class TestExtendedHostKeyVerifier extends ExtendedServerHostKeyVerifier {
 	@Override
 	public List<String> getKnownKeyAlgorithmsForHost(String hostname, int port) {
 		String[] algorithms = knownHosts.getPreferredServerHostkeyAlgorithmOrder(hostname);
-		if (algorithms == null)
+		if (algorithms == null) {
 			return null;
+		}
 		return Arrays.asList(algorithms);
 	}
 

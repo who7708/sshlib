@@ -33,7 +33,6 @@ public class Ed25519KeyFactoryTest {
 		assertThat(pk.getSeed(), is(KAT_ED25519_PRIV));
 	}
 
-
 	@Test
 	public void generatesPublicKey() throws Exception {
 		Ed25519Provider p = new Ed25519Provider();
