@@ -24,7 +24,7 @@ public class PacketNewKeys {
 
         if (packet_type != Packets.SSH_MSG_NEWKEYS) {
             throw new IOException("This is not a SSH_MSG_NEWKEYS! ("
-                + packet_type + ")");
+                    + packet_type + ")");
         }
 
         if (tr.remain() != 0) {

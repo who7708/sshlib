@@ -19,7 +19,7 @@ public class LocalAcceptThread extends Thread implements IChannelWorkerThread {
     final ServerSocket ss;
 
     public LocalAcceptThread(ChannelManager cm, int local_port, String host_to_connect, int port_to_connect)
-        throws IOException {
+            throws IOException {
         this.cm = cm;
         this.host_to_connect = host_to_connect;
         this.port_to_connect = port_to_connect;
@@ -63,7 +63,7 @@ public class LocalAcceptThread extends Thread implements IChannelWorkerThread {
                 /* This may fail, e.g., if the remote port is closed (in optimistic terms: not open yet) */
 
                 cn = cm.openDirectTCPIPChannel(host_to_connect, port_to_connect, s.getInetAddress().getHostAddress(), s
-                    .getPort());
+                        .getPort());
 
             } catch (IOException e) {
                 /* Simply close the local socket and wait for the next incoming connection */
@@ -83,7 +83,7 @@ public class LocalAcceptThread extends Thread implements IChannelWorkerThread {
                 try {
                     /* This message is only visible during debugging, since we discard the channel immediatelly */
                     cn.cm.closeChannel(cn, "Weird error during creation of StreamForwarder (" + e.getMessage() + ")",
-                        true);
+                            true);
                 } catch (IOException ignore) {
                 }
 

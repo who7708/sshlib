@@ -476,7 +476,7 @@ public class AuthAgentForwardThread extends Thread implements IChannelWorkerThre
                 }
             } else if (privKey instanceof DSAPrivateKey) {
                 response = DSASHA1Verify.get().generateSignature(challenge,
-                    privKey, new SecureRandom());
+                        privKey, new SecureRandom());
             } else {
                 os.write(SSH_AGENT_FAILURE);
                 return;

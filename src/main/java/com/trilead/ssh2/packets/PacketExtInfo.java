@@ -41,7 +41,7 @@ public class PacketExtInfo {
         int packet_type = tr.readByte();
         if (packet_type != Packets.SSH_MSG_EXT_INFO) {
             throw new IOException("This is not a SSH_MSG_EXT_INFO! ("
-                + packet_type + ")");
+                    + packet_type + ")");
         }
 
         // Type has dynamic number of fields

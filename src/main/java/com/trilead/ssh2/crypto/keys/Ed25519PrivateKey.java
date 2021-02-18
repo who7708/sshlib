@@ -99,22 +99,22 @@ public class Ed25519PrivateKey implements PrivateKey {
         try {
             TypesReader tr = new TypesReader(keySpec.getEncoded());
             if (tr.readByte() != 0x30 || // ASN.1 sequence
-                tr.readByte() != ENCODED_SIZE - 2 || // Expected size
-                tr.readByte() != 0x02 || // ASN.1 Integer
-                tr.readByte() != 1 || // length
-                tr.readByte() != 0 || // v1
-                tr.readByte() != 0x30 || // ASN.1 Sequence
-                tr.readByte() != ED25519_OID.length + 2 || // OID length
-                tr.readByte() != 0x06 || // ASN.1 OID
-                tr.readByte() != ED25519_OID.length) {
+                    tr.readByte() != ENCODED_SIZE - 2 || // Expected size
+                    tr.readByte() != 0x02 || // ASN.1 Integer
+                    tr.readByte() != 1 || // length
+                    tr.readByte() != 0 || // v1
+                    tr.readByte() != 0x30 || // ASN.1 Sequence
+                    tr.readByte() != ED25519_OID.length + 2 || // OID length
+                    tr.readByte() != 0x06 || // ASN.1 OID
+                    tr.readByte() != ED25519_OID.length) {
                 throw new InvalidKeySpecException("Key was not encoded correctly");
             }
             byte[] oid = tr.readBytes(ED25519_OID.length);
             if (!Arrays.equals(ED25519_OID, oid) ||
-                tr.readByte() != 0x04 || // ASN.1 octet string
-                tr.readByte() != KEY_BYTES_LENGTH + 2 || // length
-                tr.readByte() != 0x04 || // ASN.1 octet string
-                tr.readByte() != KEY_BYTES_LENGTH) {
+                    tr.readByte() != 0x04 || // ASN.1 octet string
+                    tr.readByte() != KEY_BYTES_LENGTH + 2 || // length
+                    tr.readByte() != 0x04 || // ASN.1 octet string
+                    tr.readByte() != KEY_BYTES_LENGTH) {
                 throw new InvalidKeySpecException("Key was not encoded correctly");
             }
             return tr.readBytes(KEY_BYTES_LENGTH);

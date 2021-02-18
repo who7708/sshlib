@@ -46,116 +46,116 @@ import java.security.SecureRandom;
  * @author Kenny Root
  */
 public class Ed25519Verify implements SSHSignature {
-	private static final Logger log = Logger.getLogger(Ed25519Verify.class);
+    private static final Logger log = Logger.getLogger(Ed25519Verify.class);
 
-	/** Identifies this as an Ed25519 key in the protocol. */
-	public static final String ED25519_ID = "ssh-ed25519";
+    /** Identifies this as an Ed25519 key in the protocol. */
+    public static final String ED25519_ID = "ssh-ed25519";
 
-	private static final int ED25519_PK_SIZE_BYTES = 32;
-	private static final int ED25519_SIG_SIZE_BYTES = 64;
+    private static final int ED25519_PK_SIZE_BYTES = 32;
+    private static final int ED25519_SIG_SIZE_BYTES = 64;
 
-	private static class InstanceHolder {
-		private static final Ed25519Verify sInstance = new Ed25519Verify();
-	}
+    private static class InstanceHolder {
+        private static final Ed25519Verify sInstance = new Ed25519Verify();
+    }
 
-	private Ed25519Verify() {
-	}
+    private Ed25519Verify() {
+    }
 
-	public static Ed25519Verify get() {
-		return Ed25519Verify.InstanceHolder.sInstance;
-	}
+    public static Ed25519Verify get() {
+        return Ed25519Verify.InstanceHolder.sInstance;
+    }
 
-	@Override
-	public byte[] encodePublicKey(PublicKey publicKey) {
-		Ed25519PublicKey ed25519PublicKey = (Ed25519PublicKey) publicKey;
+    @Override
+    public byte[] encodePublicKey(PublicKey publicKey) {
+        Ed25519PublicKey ed25519PublicKey = (Ed25519PublicKey) publicKey;
 
-		TypesWriter tw = new TypesWriter();
+        TypesWriter tw = new TypesWriter();
 
-		tw.writeString(ED25519_ID);
-		byte[] encoded = ed25519PublicKey.getAbyte();
-		tw.writeString(encoded, 0, encoded.length);
+        tw.writeString(ED25519_ID);
+        byte[] encoded = ed25519PublicKey.getAbyte();
+        tw.writeString(encoded, 0, encoded.length);
 
-		return tw.getBytes();
-	}
+        return tw.getBytes();
+    }
 
-	@Override
-	public PublicKey decodePublicKey(byte[] encoded) throws IOException {
-		TypesReader tr = new TypesReader(encoded);
+    @Override
+    public PublicKey decodePublicKey(byte[] encoded) throws IOException {
+        TypesReader tr = new TypesReader(encoded);
 
-		String key_format = tr.readString();
-		if (!key_format.equals(ED25519_ID)) {
-			throw new IOException("This is not an Ed25519 key");
-		}
+        String key_format = tr.readString();
+        if (!key_format.equals(ED25519_ID)) {
+            throw new IOException("This is not an Ed25519 key");
+        }
 
-		byte[] keyBytes = tr.readByteString();
+        byte[] keyBytes = tr.readByteString();
 
-		if (tr.remain() != 0) {
-			throw new IOException("Padding in Ed25519 public key! " + tr.remain() + " bytes left.");
-		}
+        if (tr.remain() != 0) {
+            throw new IOException("Padding in Ed25519 public key! " + tr.remain() + " bytes left.");
+        }
 
-		if (keyBytes.length != ED25519_PK_SIZE_BYTES) {
-			throw new IOException("Ed25519 was not of correct length: " + keyBytes.length + " vs " + ED25519_PK_SIZE_BYTES);
-		}
+        if (keyBytes.length != ED25519_PK_SIZE_BYTES) {
+            throw new IOException("Ed25519 was not of correct length: " + keyBytes.length + " vs " + ED25519_PK_SIZE_BYTES);
+        }
 
-		return new Ed25519PublicKey(keyBytes);
-	}
+        return new Ed25519PublicKey(keyBytes);
+    }
 
-	@Override
-	public byte[] generateSignature(byte[] msg, PrivateKey privateKey, SecureRandom secureRandom) throws IOException {
-		Ed25519PrivateKey ed25519PrivateKey = (Ed25519PrivateKey) privateKey;
-		try {
-			return encodeSSHEd25519Signature(new Ed25519Sign(ed25519PrivateKey.getSeed()).sign(msg));
-		} catch (GeneralSecurityException e) {
-			throw new IOException(e);
-		}
-	}
+    @Override
+    public byte[] generateSignature(byte[] msg, PrivateKey privateKey, SecureRandom secureRandom) throws IOException {
+        Ed25519PrivateKey ed25519PrivateKey = (Ed25519PrivateKey) privateKey;
+        try {
+            return encodeSSHEd25519Signature(new Ed25519Sign(ed25519PrivateKey.getSeed()).sign(msg));
+        } catch (GeneralSecurityException e) {
+            throw new IOException(e);
+        }
+    }
 
-	@Override
-	public boolean verifySignature(byte[] message, byte[] sshSig, PublicKey publicKey) throws IOException {
-		Ed25519PublicKey ed25519PublicKey = (Ed25519PublicKey) publicKey;
-		byte[] javaSig = decodeSSHEd25519Signature(sshSig);
-		try {
-			new com.google.crypto.tink.subtle.Ed25519Verify(ed25519PublicKey.getAbyte()).verify(javaSig, message);
-			return true;
-		} catch (GeneralSecurityException e) {
-			return false;
-		}
-	}
+    @Override
+    public boolean verifySignature(byte[] message, byte[] sshSig, PublicKey publicKey) throws IOException {
+        Ed25519PublicKey ed25519PublicKey = (Ed25519PublicKey) publicKey;
+        byte[] javaSig = decodeSSHEd25519Signature(sshSig);
+        try {
+            new com.google.crypto.tink.subtle.Ed25519Verify(ed25519PublicKey.getAbyte()).verify(javaSig, message);
+            return true;
+        } catch (GeneralSecurityException e) {
+            return false;
+        }
+    }
 
-	private static byte[] encodeSSHEd25519Signature(byte[] sig) {
-		TypesWriter tw = new TypesWriter();
+    private static byte[] encodeSSHEd25519Signature(byte[] sig) {
+        TypesWriter tw = new TypesWriter();
 
-		tw.writeString(ED25519_ID);
-		tw.writeString(sig, 0, sig.length);
+        tw.writeString(ED25519_ID);
+        tw.writeString(sig, 0, sig.length);
 
-		return tw.getBytes();
-	}
+        return tw.getBytes();
+    }
 
-	private static byte[] decodeSSHEd25519Signature(byte[] sig) throws IOException {
-		byte[] rsArray;
+    private static byte[] decodeSSHEd25519Signature(byte[] sig) throws IOException {
+        byte[] rsArray;
 
-		TypesReader tr = new TypesReader(sig);
+        TypesReader tr = new TypesReader(sig);
 
-		String sig_format = tr.readString();
-		if (!sig_format.equals(ED25519_ID)) {
-			throw new IOException("Peer sent wrong signature format");
-		}
+        String sig_format = tr.readString();
+        if (!sig_format.equals(ED25519_ID)) {
+            throw new IOException("Peer sent wrong signature format");
+        }
 
-		rsArray = tr.readByteString();
+        rsArray = tr.readByteString();
 
-		if (tr.remain() != 0) {
-			throw new IOException("Padding in Ed25519 signature!");
-		}
+        if (tr.remain() != 0) {
+            throw new IOException("Padding in Ed25519 signature!");
+        }
 
-		if (rsArray.length > ED25519_SIG_SIZE_BYTES) {
-			throw new IOException("Ed25519 signature was " + rsArray.length + " bytes (" + ED25519_PK_SIZE_BYTES + " expected)");
-		}
+        if (rsArray.length > ED25519_SIG_SIZE_BYTES) {
+            throw new IOException("Ed25519 signature was " + rsArray.length + " bytes (" + ED25519_PK_SIZE_BYTES + " expected)");
+        }
 
-		return rsArray;
-	}
+        return rsArray;
+    }
 
-	@Override
-	public String getKeyFormat() {
-		return ED25519_ID;
-	}
+    @Override
+    public String getKeyFormat() {
+        return ED25519_ID;
+    }
 }

@@ -21,8 +21,8 @@ public abstract class AES implements BlockCipher {
     public void init(boolean forEncryption, byte[] key, byte[] iv) {
         try {
             cipher.init(forEncryption ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE,
-                new SecretKeySpec(key, "AES"),
-                new IvParameterSpec(iv));
+                    new SecretKeySpec(key, "AES"),
+                    new IvParameterSpec(iv));
         } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
             throw new IllegalArgumentException("Cannot initialize " + cipher.getAlgorithm(), e);
         }

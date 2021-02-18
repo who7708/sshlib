@@ -37,7 +37,7 @@ public class RemoteAcceptThread extends Thread {
 
         if (log.isEnabled()) {
             log.log(20, "RemoteAcceptThread: " + remoteConnectedAddress + "/" + remoteConnectedPort + ", R: "
-                + remoteOriginatorAddress + "/" + remoteOriginatorPort);
+                    + remoteOriginatorAddress + "/" + remoteOriginatorPort);
         }
     }
 
@@ -48,9 +48,9 @@ public class RemoteAcceptThread extends Thread {
             s = new Socket(targetAddress, targetPort);
 
             StreamForwarder r2l = new StreamForwarder(c, null, s, c.getStdoutStream(), s.getOutputStream(),
-                "RemoteToLocal");
+                    "RemoteToLocal");
             StreamForwarder l2r = new StreamForwarder(c, null, null, s.getInputStream(), c.getStdinStream(),
-                "LocalToRemote");
+                    "LocalToRemote");
 
             /* No need to start two threads, one can be executed in the current thread */
 

@@ -25,8 +25,8 @@ public class PacketKexDhGexGroup {
 
         if (packet_type != Packets.SSH_MSG_KEX_DH_GEX_GROUP) {
             throw new IllegalArgumentException(
-                "This is not a SSH_MSG_KEX_DH_GEX_GROUP! (" + packet_type
-                    + ")");
+                    "This is not a SSH_MSG_KEX_DH_GEX_GROUP! (" + packet_type
+                            + ")");
         }
 
         p = tr.readMPINT();

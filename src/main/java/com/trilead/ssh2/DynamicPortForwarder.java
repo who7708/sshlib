@@ -29,11 +29,11 @@
 
 package com.trilead.ssh2;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-
 import com.trilead.ssh2.channel.ChannelManager;
 import com.trilead.ssh2.channel.DynamicAcceptThread;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
 
 /**
  * A <code>DynamicPortForwarder</code> forwards TCP/IP connections to a local
@@ -45,33 +45,31 @@ import com.trilead.ssh2.channel.DynamicAcceptThread;
  * @version $Id: $
  */
 public class DynamicPortForwarder {
-	ChannelManager cm;
+    ChannelManager cm;
 
-	DynamicAcceptThread dat;
+    DynamicAcceptThread dat;
 
-	DynamicPortForwarder(ChannelManager cm, int local_port)
-			throws IOException
-	{
-		this.cm = cm;
+    DynamicPortForwarder(ChannelManager cm, int local_port)
+            throws IOException {
+        this.cm = cm;
 
-		dat = new DynamicAcceptThread(cm, local_port);
-		dat.setDaemon(true);
-		dat.start();
-	}
+        dat = new DynamicAcceptThread(cm, local_port);
+        dat.setDaemon(true);
+        dat.start();
+    }
 
-	DynamicPortForwarder(ChannelManager cm, InetSocketAddress addr) throws IOException {
-		this.cm = cm;
+    DynamicPortForwarder(ChannelManager cm, InetSocketAddress addr) throws IOException {
+        this.cm = cm;
 
-		dat = new DynamicAcceptThread(cm, addr);
-		dat.setDaemon(true);
-		dat.start();
-	}
+        dat = new DynamicAcceptThread(cm, addr);
+        dat.setDaemon(true);
+        dat.start();
+    }
 
-	/**
-	 * Stop TCP/IP forwarding of newly arriving connections.
-	 *
-	 */
-	public void close() {
-		dat.stopWorking();
-	}
+    /**
+     * Stop TCP/IP forwarding of newly arriving connections.
+     */
+    public void close() {
+        dat.stopWorking();
+    }
 }

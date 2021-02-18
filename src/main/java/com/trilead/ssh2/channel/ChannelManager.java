@@ -137,7 +137,7 @@ public class ChannelManager implements MessageHandler {
             }
 
             throw new IOException("Illegal state. The server sent " + globalSuccessCounter
-                + " SSH_MSG_REQUEST_SUCCESS and " + globalFailedCounter + " SSH_MSG_REQUEST_FAILURE messages.");
+                    + " SSH_MSG_REQUEST_SUCCESS and " + globalFailedCounter + " SSH_MSG_REQUEST_FAILURE messages.");
         }
     }
 
@@ -169,7 +169,7 @@ public class ChannelManager implements MessageHandler {
             }
 
             throw new IOException("Illegal state. The server sent " + c.successCounter
-                + " SSH_MSG_CHANNEL_SUCCESS and " + c.failedCounter + " SSH_MSG_CHANNEL_FAILURE messages.");
+                    + " SSH_MSG_CHANNEL_SUCCESS and " + c.failedCounter + " SSH_MSG_CHANNEL_FAILURE messages.");
         }
     }
 
@@ -400,7 +400,7 @@ public class ChannelManager implements MessageHandler {
     }
 
     public int requestGlobalForward(String bindAddress, int bindPort, String targetAddress, int targetPort)
-        throws IOException {
+            throws IOException {
         RemoteForwardingData rfd = new RemoteForwardingData();
 
         rfd.bindAddress = bindAddress;
@@ -457,7 +457,7 @@ public class ChannelManager implements MessageHandler {
         }
 
         PacketGlobalCancelForwardRequest pgcf = new PacketGlobalCancelForwardRequest(true, rfd.bindAddress,
-            rfd.bindPort);
+                rfd.bindPort);
         tm.sendMessage(pgcf.getPayload());
 
         if (log.isEnabled()) {
@@ -529,7 +529,7 @@ public class ChannelManager implements MessageHandler {
         }
 
         PacketOpenDirectTCPIPChannel dtc = new PacketOpenDirectTCPIPChannel(c.localID, c.localWindow,
-            c.localMaxPacketSize, host_to_connect, port_to_connect, originator_IP_address, originator_port);
+                c.localMaxPacketSize, host_to_connect, port_to_connect, originator_IP_address, originator_port);
 
         tm.sendMessage(dtc.getPayload());
 
@@ -574,7 +574,7 @@ public class ChannelManager implements MessageHandler {
         try {
             if (waitForGlobalRequestResult()) {
                 throw new IOException("Your server is alive - but buggy. "
-                    + "It replied with SSH_MSG_REQUEST_SUCCESS when it actually should not.");
+                        + "It replied with SSH_MSG_REQUEST_SUCCESS when it actually should not.");
             }
 
         } catch (IOException e) {
@@ -605,7 +605,7 @@ public class ChannelManager implements MessageHandler {
         try {
             if (waitForChannelRequestResult(c)) {
                 throw new IOException("Your server is alive - but buggy. "
-                    + "It replied with SSH_MSG_SESSION_SUCCESS when it actually should not.");
+                        + "It replied with SSH_MSG_SESSION_SUCCESS when it actually should not.");
             }
 
         } catch (IOException e) {
@@ -623,7 +623,7 @@ public class ChannelManager implements MessageHandler {
             }
 
             spr = new PacketSessionPtyRequest(c.remoteID, true, term, term_width_characters, term_height_characters,
-                term_width_pixels, term_height_pixels, terminal_modes);
+                    term_width_pixels, term_height_pixels, terminal_modes);
 
             c.successCounter = c.failedCounter = 0;
         }
@@ -651,18 +651,18 @@ public class ChannelManager implements MessageHandler {
         synchronized (c) {
             if (c.state != Channel.STATE_OPEN) {
                 throw new IOException("Cannot request PTY on this channel ("
-                    + c.getReasonClosed() + ")");
+                        + c.getReasonClosed() + ")");
             }
 
             spr = new PacketSessionPtyResize(c.remoteID, term_width_characters, term_height_characters,
-                term_width_pixels, term_height_pixels);
+                    term_width_pixels, term_height_pixels);
             c.successCounter = c.failedCounter = 0;
         }
 
         synchronized (c.channelSendLock) {
             if (c.closeMessageSent) {
                 throw new IOException("Cannot request PTY on this channel ("
-                    + c.getReasonClosed() + ")");
+                        + c.getReasonClosed() + ")");
             }
             tm.sendMessage(spr.getPayload());
         }
@@ -678,7 +678,7 @@ public class ChannelManager implements MessageHandler {
             }
 
             psr = new PacketSessionX11Request(c.remoteID, true, singleConnection, x11AuthenticationProtocol,
-                x11AuthenticationCookie, x11ScreenNumber);
+                    x11AuthenticationCookie, x11ScreenNumber);
 
             c.successCounter = c.failedCounter = 0;
         }
@@ -815,7 +815,7 @@ public class ChannelManager implements MessageHandler {
 
         if (len != (msglen - 13)) {
             throw new IOException("SSH_MSG_CHANNEL_EXTENDED_DATA message has wrong len (calculated " + (msglen - 13)
-                + ", got " + len + ")");
+                    + ", got " + len + ")");
         }
 
         if (log.isEnabled()) {
@@ -829,7 +829,7 @@ public class ChannelManager implements MessageHandler {
 
             if (c.state != Channel.STATE_OPEN) {
                 throw new IOException("Got SSH_MSG_CHANNEL_EXTENDED_DATA, but channel is not in correct state ("
-                    + c.state + ")");
+                        + c.state + ")");
             }
 
             if (c.localWindow < len) {
@@ -979,7 +979,7 @@ public class ChannelManager implements MessageHandler {
 
                 if (c.stdoutReadpos != c.stdoutWritepos) {
                     System.arraycopy(c.stdoutBuffer, c.stdoutReadpos, c.stdoutBuffer, 0, c.stdoutWritepos
-                        - c.stdoutReadpos);
+                            - c.stdoutReadpos);
                 }
 
                 c.stdoutWritepos -= c.stdoutReadpos;
@@ -991,7 +991,7 @@ public class ChannelManager implements MessageHandler {
 
                 if (c.stderrReadpos != c.stderrWritepos) {
                     System.arraycopy(c.stderrBuffer, c.stderrReadpos, c.stderrBuffer, 0, c.stderrWritepos
-                        - c.stderrReadpos);
+                            - c.stderrReadpos);
                 }
 
                 c.stderrWritepos -= c.stderrReadpos;
@@ -1004,7 +1004,7 @@ public class ChannelManager implements MessageHandler {
 
             if (c.localWindow < ((Channel.CHANNEL_BUFFER_SIZE + 1) / 2)) {
                 int minFreeSpace = Math.min(Channel.CHANNEL_BUFFER_SIZE - c.stdoutWritepos, Channel.CHANNEL_BUFFER_SIZE
-                    - c.stderrWritepos);
+                        - c.stderrWritepos);
 
                 increment = minFreeSpace - c.localWindow;
                 c.localWindow = minFreeSpace;
@@ -1063,7 +1063,7 @@ public class ChannelManager implements MessageHandler {
 
         if (len != (msglen - 9)) {
             throw new IOException("SSH_MSG_CHANNEL_DATA message has wrong len (calculated " + (msglen - 9) + ", got "
-                + len + ")");
+                    + len + ")");
         }
 
         if (log.isEnabled()) {
@@ -1140,7 +1140,7 @@ public class ChannelManager implements MessageHandler {
 
                 if (x11_magic_cookies.size() == 0) {
                     PacketChannelOpenFailure pcof = new PacketChannelOpenFailure(remoteID,
-                        Packets.SSH_OPEN_ADMINISTRATIVELY_PROHIBITED, "X11 forwarding not activated", "");
+                            Packets.SSH_OPEN_ADMINISTRATIVELY_PROHIBITED, "X11 forwarding not activated", "");
 
                     tm.sendAsynchronousMessage(pcof.getPayload());
 
@@ -1189,8 +1189,8 @@ public class ChannelManager implements MessageHandler {
 
             if (rfd == null) {
                 PacketChannelOpenFailure pcof = new PacketChannelOpenFailure(remoteID,
-                    Packets.SSH_OPEN_ADMINISTRATIVELY_PROHIBITED,
-                    "No thanks, unknown port in forwarded-tcpip request", "");
+                        Packets.SSH_OPEN_ADMINISTRATIVELY_PROHIBITED,
+                        "No thanks, unknown port in forwarded-tcpip request", "");
 
                 /* Always try to be polite. */
 
@@ -1217,7 +1217,7 @@ public class ChannelManager implements MessageHandler {
              */
 
             RemoteAcceptThread rat = new RemoteAcceptThread(c, remoteConnectedAddress, remoteConnectedPort,
-                remoteOriginatorAddress, remoteOriginatorPort, rfd.targetAddress, rfd.targetPort);
+                    remoteOriginatorAddress, remoteOriginatorPort, rfd.targetAddress, rfd.targetPort);
 
             rat.setDaemon(true);
             rat.start();
@@ -1246,7 +1246,7 @@ public class ChannelManager implements MessageHandler {
         /* Tell the server that we have no idea what it is talking about */
 
         PacketChannelOpenFailure pcof = new PacketChannelOpenFailure(remoteID, Packets.SSH_OPEN_UNKNOWN_CHANNEL_TYPE,
-            "Unknown channel type", "");
+                "Unknown channel type", "");
 
         tm.sendAsynchronousMessage(pcof.getPayload());
 
@@ -1449,13 +1449,13 @@ public class ChannelManager implements MessageHandler {
 
         if (c == null) {
             throw new IOException("Unexpected SSH_MSG_CHANNEL_OPEN_CONFIRMATION message for non-existent channel "
-                + sm.recipientChannelID);
+                    + sm.recipientChannelID);
         }
 
         synchronized (c) {
             if (c.state != Channel.STATE_OPENING) {
                 throw new IOException("Unexpected SSH_MSG_CHANNEL_OPEN_CONFIRMATION message for channel "
-                    + sm.recipientChannelID);
+                        + sm.recipientChannelID);
             }
 
             c.remoteID = sm.senderChannelID;
@@ -1467,7 +1467,7 @@ public class ChannelManager implements MessageHandler {
 
         if (log.isEnabled()) {
             log.log(50, "Got SSH_MSG_CHANNEL_OPEN_CONFIRMATION (channel " + sm.recipientChannelID + " / remote: "
-                + sm.senderChannelID + ")");
+                    + sm.senderChannelID + ")");
         }
     }
 
@@ -1525,7 +1525,7 @@ public class ChannelManager implements MessageHandler {
             c.EOF = true;
             c.state = Channel.STATE_CLOSED;
             c.setReasonClosed("The server refused to open the channel (" + reasonCodeSymbolicName + ", '"
-                + descriptionBuffer.toString() + "')");
+                    + descriptionBuffer.toString() + "')");
             c.notifyAll();
         }
 

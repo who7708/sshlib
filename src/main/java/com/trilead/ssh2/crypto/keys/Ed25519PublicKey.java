@@ -80,18 +80,18 @@ public class Ed25519PublicKey implements PublicKey {
         try {
             TypesReader tr = new TypesReader(input);
             if (tr.readByte() != 0x30 ||
-                tr.readByte() != 7 + ED25519_OID.length + KEY_BYTES_LENGTH ||
-                tr.readByte() != 0x30 ||
-                tr.readByte() != 2 + ED25519_OID.length ||
-                tr.readByte() != 0x06 ||
-                tr.readByte() != ED25519_OID.length) {
+                    tr.readByte() != 7 + ED25519_OID.length + KEY_BYTES_LENGTH ||
+                    tr.readByte() != 0x30 ||
+                    tr.readByte() != 2 + ED25519_OID.length ||
+                    tr.readByte() != 0x06 ||
+                    tr.readByte() != ED25519_OID.length) {
                 throw new InvalidKeySpecException("Key was not encoded correctly");
             }
             byte[] oid = tr.readBytes(ED25519_OID.length);
             if (!Arrays.equals(oid, ED25519_OID) ||
-                tr.readByte() != 0x03 ||
-                tr.readByte() != KEY_BYTES_LENGTH + 1 ||
-                tr.readByte() != 0) {
+                    tr.readByte() != 0x03 ||
+                    tr.readByte() != KEY_BYTES_LENGTH + 1 ||
+                    tr.readByte() != 0) {
                 throw new InvalidKeySpecException("Key was not encoded correctly");
             }
             return tr.readBytes(KEY_BYTES_LENGTH);

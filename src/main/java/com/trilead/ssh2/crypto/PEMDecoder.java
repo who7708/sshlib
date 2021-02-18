@@ -53,7 +53,7 @@ public class PEMDecoder {
     public static final int PEM_OPENSSH_PRIVATE_KEY = 4;
 
     private static final byte[] OPENSSH_V1_MAGIC = new byte[]{
-        'o', 'p', 'e', 'n', 's', 's', 'h', '-', 'k', 'e', 'y', '-', 'v', '1', '\0',
+            'o', 'p', 'e', 'n', 's', 's', 'h', '-', 'k', 'e', 'y', '-', 'v', '1', '\0',
     };
 
     private static int hexToInt(char c) {
@@ -94,7 +94,7 @@ public class PEMDecoder {
     }
 
     private static byte[] generateKeyFromPasswordSaltWithMD5(byte[] password, byte[] salt, int keyLen)
-        throws IOException {
+            throws IOException {
         if (salt.length < 8) {
             throw new IllegalArgumentException("Salt needs to be at least 8 bytes for key generation.");
         }
@@ -318,7 +318,7 @@ public class PEMDecoder {
 
         if ((data.length % bc.getBlockSize()) != 0) {
             throw new IOException("Invalid PEM structure, size of encrypted block is not a multiple of "
-                + bc.getBlockSize());
+                    + bc.getBlockSize());
         }
 
         /* Now decrypt the content */
@@ -573,7 +573,7 @@ public class PEMDecoder {
                 byte[] publicBytes = trEnc.readByteString();
                 byte[] privateBytes = trEnc.readByteString();
                 PrivateKey privKey = new Ed25519PrivateKey(
-                    Arrays.copyOfRange(privateBytes, 0, 32));
+                        Arrays.copyOfRange(privateBytes, 0, 32));
                 PublicKey pubKey = new Ed25519PublicKey(publicBytes);
                 keyPair = new KeyPair(pubKey, privKey);
             } else if (keyType.startsWith("ecdsa-sha2-")) {
@@ -656,7 +656,7 @@ public class PEMDecoder {
      * Generate a {@code KeyPair} given an {@code algorithm} and {@code KeySpec}.
      */
     private static KeyPair generateKeyPair(String algorithm, KeySpec privSpec, KeySpec pubSpec)
-        throws IOException {
+            throws IOException {
         try {
             final KeyFactory kf = KeyFactory.getInstance(algorithm);
             final PublicKey pubKey = kf.generatePublic(pubSpec);

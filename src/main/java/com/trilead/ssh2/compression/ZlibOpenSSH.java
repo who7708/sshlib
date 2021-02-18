@@ -36,12 +36,11 @@ package com.trilead.ssh2.compression;
  * compression is disabled until userauth has occurred.
  *
  * @author Matt Johnston
- *
  */
 public class ZlibOpenSSH extends Zlib {
 
-	public boolean canCompressPreauth() {
-		return false;
-	}
+    public boolean canCompressPreauth() {
+        return false;
+    }
 
 }

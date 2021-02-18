@@ -9,12 +9,12 @@ package com.trilead.ssh2.crypto.digest;
 public final class MACs {
     /* Higher Priority First */
     private static final String[] MAC_LIST = {
-        HMAC.HMAC_SHA2_256_ETM,
-        HMAC.HMAC_SHA2_512_ETM,
-        HMAC.HMAC_SHA1_ETM,
-        HMAC.HMAC_SHA2_256,
-        HMAC.HMAC_SHA2_512,
-        HMAC.HMAC_SHA1,
+            HMAC.HMAC_SHA2_256_ETM,
+            HMAC.HMAC_SHA2_512_ETM,
+            HMAC.HMAC_SHA1_ETM,
+            HMAC.HMAC_SHA2_256,
+            HMAC.HMAC_SHA2_512,
+            HMAC.HMAC_SHA1,
     };
 
     public final static String[] getMacList() {

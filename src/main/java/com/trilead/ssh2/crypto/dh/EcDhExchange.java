@@ -57,13 +57,13 @@ public class EcDhExchange extends GenericDhExchange {
     @Override
     public byte[] getE() {
         return ECDSASHA2Verify.encodeECPoint(clientPublic.getW(), clientPublic.getParams()
-            .getCurve());
+                .getCurve());
     }
 
     @Override
     protected byte[] getServerE() {
         return ECDSASHA2Verify.encodeECPoint(serverPublic.getW(), serverPublic.getParams()
-            .getCurve());
+                .getCurve());
     }
 
     @Override
@@ -84,7 +84,7 @@ public class EcDhExchange extends GenericDhExchange {
             ECPoint serverPoint = verifier.decodeECPoint(f);
             ECParameterSpec params = verifier.getParameterSpec();
             this.serverPublic = (ECPublicKey) kf.generatePublic(new ECPublicKeySpec(serverPoint,
-                params));
+                    params));
 
             ka = KeyAgreement.getInstance("ECDH");
             ka.init(clientPrivate);

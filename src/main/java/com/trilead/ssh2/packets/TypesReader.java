@@ -103,7 +103,7 @@ public class TypesReader {
         }
 
         return ((arr[pos++] & 0xff) << 24) | ((arr[pos++] & 0xff) << 16) | ((arr[pos++] & 0xff) << 8)
-            | (arr[pos++] & 0xff);
+                | (arr[pos++] & 0xff);
     }
 
     public long readUINT64() throws IOException {
@@ -112,10 +112,10 @@ public class TypesReader {
         }
 
         long high = ((arr[pos++] & 0xff) << 24) | ((arr[pos++] & 0xff) << 16) | ((arr[pos++] & 0xff) << 8)
-            | (arr[pos++] & 0xff); /* sign extension may take place - will be shifted away =) */
+                | (arr[pos++] & 0xff); /* sign extension may take place - will be shifted away =) */
 
         long low = ((arr[pos++] & 0xff) << 24) | ((arr[pos++] & 0xff) << 16) | ((arr[pos++] & 0xff) << 8)
-            | (arr[pos++] & 0xff); /* sign extension may take place - handle below */
+                | (arr[pos++] & 0xff); /* sign extension may take place - handle below */
 
         return (high << 32) | (low & 0xffffffffl); /* see Java language spec (15.22.1, 5.6.2) */
     }

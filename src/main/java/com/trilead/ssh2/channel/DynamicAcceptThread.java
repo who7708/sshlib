@@ -49,7 +49,7 @@ public class DynamicAcceptThread extends Thread implements IChannelWorkerThread 
     private final ServerSocket ss;
 
     public DynamicAcceptThread(ChannelManager cm, int local_port)
-        throws IOException {
+            throws IOException {
         this.cm = cm;
 
         setName("DynamicAcceptThread");
@@ -58,7 +58,7 @@ public class DynamicAcceptThread extends Thread implements IChannelWorkerThread 
     }
 
     public DynamicAcceptThread(ChannelManager cm, InetSocketAddress localAddress)
-        throws IOException {
+            throws IOException {
         this.cm = cm;
 
         ss = new ServerSocket();
@@ -161,7 +161,7 @@ public class DynamicAcceptThread extends Thread implements IChannelWorkerThread 
                  */
 
                 cn = cm.openDirectTCPIPChannel(destHost, server.getPort(),
-                    "127.0.0.1", 0);
+                        "127.0.0.1", 0);
 
             } catch (IOException e) {
                 /*

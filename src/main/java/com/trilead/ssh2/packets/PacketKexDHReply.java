@@ -25,7 +25,7 @@ public class PacketKexDHReply {
 
         if (packet_type != Packets.SSH_MSG_KEXDH_REPLY) {
             throw new IOException("This is not a SSH_MSG_KEXDH_REPLY! ("
-                + packet_type + ")");
+                    + packet_type + ")");
         }
 
         hostKey = tr.readByteString();

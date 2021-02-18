@@ -60,7 +60,7 @@ public class Curve25519Exchange extends GenericDhExchange {
     public void setF(byte[] f) throws IOException {
         if (f.length != KEY_SIZE) {
             throw new IOException("Server sent invalid key length " + f.length + " (expected " +
-                KEY_SIZE + ")");
+                    KEY_SIZE + ")");
         }
         serverPublic = f.clone();
         try {

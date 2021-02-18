@@ -152,24 +152,24 @@ public class AuthenticationManager implements MessageHandler {
     }
 
     public boolean authenticatePublicKey(String user, char[] PEMPrivateKey, String password, SecureRandom rnd)
-        throws IOException {
+            throws IOException {
         KeyPair pair = PEMDecoder.decode(PEMPrivateKey, password);
 
         return authenticatePublicKey(user, pair, rnd);
     }
 
     public boolean authenticatePublicKey(String user, KeyPair pair, SecureRandom rnd)
-        throws IOException {
+            throws IOException {
         return authenticatePublicKey(user, pair, rnd, null);
     }
 
     public boolean authenticatePublicKey(String user, SignatureProxy signatureProxy)
-        throws IOException {
+            throws IOException {
         return authenticatePublicKey(user, null, null, signatureProxy);
     }
 
     public boolean authenticatePublicKey(String user, KeyPair pair, SecureRandom rnd, SignatureProxy signatureProxy)
-        throws IOException {
+            throws IOException {
         PrivateKey privateKey = null;
         PublicKey publicKey = null;
         if (pair != null) {
@@ -201,7 +201,7 @@ public class AuthenticationManager implements MessageHandler {
                 }
 
                 PacketUserauthRequestPublicKey ua = new PacketUserauthRequestPublicKey("ssh-connection", user,
-                    DSASHA1Verify.ID_SSH_DSS, pk_enc, ds_enc);
+                        DSASHA1Verify.ID_SSH_DSS, pk_enc, ds_enc);
                 tm.sendMessage(ua.getPayload());
             } else if (publicKey instanceof RSAPublicKey) {
                 byte[] pk_enc = RSASHA1Verify.get().encodePublicKey(publicKey);
@@ -242,7 +242,7 @@ public class AuthenticationManager implements MessageHandler {
                 }
 
                 PacketUserauthRequestPublicKey ua = new PacketUserauthRequestPublicKey("ssh-connection", user,
-                    pk_algorithm, pk_enc, rsa_sig_enc);
+                        pk_algorithm, pk_enc, rsa_sig_enc);
 
                 tm.sendMessage(ua.getPayload());
             } else if (publicKey instanceof ECPublicKey) {
@@ -264,7 +264,7 @@ public class AuthenticationManager implements MessageHandler {
                 }
 
                 PacketUserauthRequestPublicKey ua = new PacketUserauthRequestPublicKey("ssh-connection", user,
-                    algo, pk_enc, ec_sig_enc);
+                        algo, pk_enc, ec_sig_enc);
 
                 tm.sendMessage(ua.getPayload());
             } else if (publicKey instanceof Ed25519PublicKey) {
@@ -283,7 +283,7 @@ public class AuthenticationManager implements MessageHandler {
                 }
 
                 PacketUserauthRequestPublicKey ua = new PacketUserauthRequestPublicKey("ssh-connection", user,
-                    algo, pk_enc, ed_sig_enc);
+                        algo, pk_enc, ed_sig_enc);
 
                 tm.sendMessage(ua.getPayload());
             } else {
@@ -336,7 +336,7 @@ public class AuthenticationManager implements MessageHandler {
 
             if (!methodPossible("keyboard-interactive")) {
                 throw new IOException(
-                    "Authentication method keyboard-interactive not supported by the server at this stage.");
+                        "Authentication method keyboard-interactive not supported by the server at this stage.");
             }
 
             if (submethods == null) {
@@ -344,7 +344,7 @@ public class AuthenticationManager implements MessageHandler {
             }
 
             PacketUserauthRequestInteractive ua = new PacketUserauthRequestInteractive("ssh-connection", user,
-                submethods);
+                    submethods);
 
             tm.sendMessage(ua.getPayload());
 
@@ -358,7 +358,7 @@ public class AuthenticationManager implements MessageHandler {
 
                     try {
                         responses = cb.replyToChallenge(pui.getName(), pui.getInstruction(), pui.getNumPrompts(), pui
-                            .getPrompt(), pui.getEcho());
+                                .getPrompt(), pui.getEcho());
                     } catch (Exception e) {
                         throw new IOException("Exception in callback.", e);
                     }

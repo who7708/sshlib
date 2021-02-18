@@ -64,7 +64,7 @@ public class KeyMaterial {
 
     public static KeyMaterial create(String hashAlgo, byte[] H, BigInteger K, byte[] SessionID, int keyLengthCS,
                                      int blockSizeCS, int macLengthCS, int keyLengthSC, int blockSizeSC, int macLengthSC)
-        throws IllegalArgumentException {
+            throws IllegalArgumentException {
         KeyMaterial km = new KeyMaterial();
 
         HashForSSH2Types sh = new HashForSSH2Types(hashAlgo);

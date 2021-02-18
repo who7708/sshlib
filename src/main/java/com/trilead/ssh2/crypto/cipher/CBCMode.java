@@ -18,14 +18,14 @@ public class CBCMode implements BlockCipher {
     }
 
     public CBCMode(BlockCipher tc, byte[] iv, boolean doEncrypt)
-        throws IllegalArgumentException {
+            throws IllegalArgumentException {
         this.tc = tc;
         this.blockSize = tc.getBlockSize();
         this.doEncrypt = doEncrypt;
 
         if (this.blockSize != iv.length) {
             throw new IllegalArgumentException("IV must be " + blockSize
-                + " bytes long! (currently " + iv.length + ")");
+                    + " bytes long! (currently " + iv.length + ")");
         }
 
         this.cbc_vector = new byte[blockSize];

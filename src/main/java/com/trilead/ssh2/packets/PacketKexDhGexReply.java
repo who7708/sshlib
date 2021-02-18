@@ -1,7 +1,6 @@
 package com.trilead.ssh2.packets;
 
 import java.io.IOException;
-
 import java.math.BigInteger;
 
 /**
@@ -17,7 +16,7 @@ public class PacketKexDhGexReply {
     BigInteger f;
     byte[] signature;
 
-    public PacketKexDhGexReply(byte payload[], int off, int len) throws IOException {
+    public PacketKexDhGexReply(byte[] payload, int off, int len) throws IOException {
         this.payload = new byte[len];
         System.arraycopy(payload, off, this.payload, 0, len);
 
