@@ -45,150 +45,150 @@ import java.net.Socket;
  * @version $Id$
  */
 public class DynamicAcceptThread extends Thread implements IChannelWorkerThread {
-	private final ChannelManager cm;
-	private final ServerSocket ss;
+    private final ChannelManager cm;
+    private final ServerSocket ss;
 
-	public DynamicAcceptThread(ChannelManager cm, int local_port)
-		throws IOException {
-		this.cm = cm;
+    public DynamicAcceptThread(ChannelManager cm, int local_port)
+        throws IOException {
+        this.cm = cm;
 
-		setName("DynamicAcceptThread");
+        setName("DynamicAcceptThread");
 
-		ss = new ServerSocket(local_port);
-	}
+        ss = new ServerSocket(local_port);
+    }
 
-	public DynamicAcceptThread(ChannelManager cm, InetSocketAddress localAddress)
-		throws IOException {
-		this.cm = cm;
+    public DynamicAcceptThread(ChannelManager cm, InetSocketAddress localAddress)
+        throws IOException {
+        this.cm = cm;
 
-		ss = new ServerSocket();
-		ss.bind(localAddress);
-	}
+        ss = new ServerSocket();
+        ss.bind(localAddress);
+    }
 
-	@Override
-	public void run() {
-		try {
-			cm.registerThread(this);
-		} catch (IOException e) {
-			stopWorking();
-			return;
-		}
+    @Override
+    public void run() {
+        try {
+            cm.registerThread(this);
+        } catch (IOException e) {
+            stopWorking();
+            return;
+        }
 
-		while (true) {
-			final Socket sock;
-			try {
-				sock = ss.accept();
-			} catch (IOException e) {
-				stopWorking();
-				return;
-			}
+        while (true) {
+            final Socket sock;
+            try {
+                sock = ss.accept();
+            } catch (IOException e) {
+                stopWorking();
+                return;
+            }
 
-			DynamicAcceptRunnable dar = new DynamicAcceptRunnable(sock);
-			Thread t = new Thread(dar);
-			t.setDaemon(true);
-			t.start();
-		}
-	}
+            DynamicAcceptRunnable dar = new DynamicAcceptRunnable(sock);
+            Thread t = new Thread(dar);
+            t.setDaemon(true);
+            t.start();
+        }
+    }
 
-	@Override
-	public void stopWorking() {
-		try {
-			/* This will lead to an IOException in the ss.accept() call */
-			ss.close();
-		} catch (IOException ignore) {
-		}
-	}
+    @Override
+    public void stopWorking() {
+        try {
+            /* This will lead to an IOException in the ss.accept() call */
+            ss.close();
+        } catch (IOException ignore) {
+        }
+    }
 
-	class DynamicAcceptRunnable implements Runnable {
-		private static final int idleTimeout = 180000; //3 minutes
+    class DynamicAcceptRunnable implements Runnable {
+        private static final int idleTimeout = 180000; //3 minutes
 
-		private final Socket sock;
-		private InputStream in;
-		private OutputStream out;
+        private final Socket sock;
+        private InputStream in;
+        private OutputStream out;
 
-		public DynamicAcceptRunnable(Socket sock) {
-			this.sock = sock;
+        public DynamicAcceptRunnable(Socket sock) {
+            this.sock = sock;
 
-			setName("DynamicAcceptRunnable");
-		}
+            setName("DynamicAcceptRunnable");
+        }
 
-		public void run() {
-			try {
-				startSession();
-			} catch (IOException ioe) {
-				try {
-					sock.close();
-				} catch (IOException ignore) {
-				}
-			}
-		}
+        public void run() {
+            try {
+                startSession();
+            } catch (IOException ioe) {
+                try {
+                    sock.close();
+                } catch (IOException ignore) {
+                }
+            }
+        }
 
-		private void startSession() throws IOException {
-			sock.setSoTimeout(idleTimeout);
+        private void startSession() throws IOException {
+            sock.setSoTimeout(idleTimeout);
 
-			in = sock.getInputStream();
-			out = sock.getOutputStream();
-			Socks5Server server = new Socks5Server(in, out);
-			try {
-				if (!server.acceptAuthentication() || !server.readRequest()) {
-					System.out.println("Could not start SOCKS session");
-					return;
-				}
-			} catch (IOException ioe) {
-				server.sendReply(Socks5Server.ResponseCode.GENERAL_FAILURE);
-				return;
-			}
+            in = sock.getInputStream();
+            out = sock.getOutputStream();
+            Socks5Server server = new Socks5Server(in, out);
+            try {
+                if (!server.acceptAuthentication() || !server.readRequest()) {
+                    System.out.println("Could not start SOCKS session");
+                    return;
+                }
+            } catch (IOException ioe) {
+                server.sendReply(Socks5Server.ResponseCode.GENERAL_FAILURE);
+                return;
+            }
 
-			if (server.getCommand() == Socks5Server.Command.CONNECT) {
-				onConnect(server);
-			} else {
-				server.sendReply(Socks5Server.ResponseCode.COMMAND_NOT_SUPPORTED);
-			}
-		}
+            if (server.getCommand() == Socks5Server.Command.CONNECT) {
+                onConnect(server);
+            } else {
+                server.sendReply(Socks5Server.ResponseCode.COMMAND_NOT_SUPPORTED);
+            }
+        }
 
-		private void onConnect(Socks5Server server) throws IOException {
-			final Channel cn;
+        private void onConnect(Socks5Server server) throws IOException {
+            final Channel cn;
 
-			String destHost = server.getHostName();
-			if (destHost == null) {
-				destHost = server.getAddress().getHostAddress();
-			}
+            String destHost = server.getHostName();
+            if (destHost == null) {
+                destHost = server.getAddress().getHostAddress();
+            }
 
-			try {
-				/*
-				 * This may fail, e.g., if the remote port is closed (in
-				 * optimistic terms: not open yet)
-				 */
+            try {
+                /*
+                 * This may fail, e.g., if the remote port is closed (in
+                 * optimistic terms: not open yet)
+                 */
 
-				cn = cm.openDirectTCPIPChannel(destHost, server.getPort(),
-					"127.0.0.1", 0);
+                cn = cm.openDirectTCPIPChannel(destHost, server.getPort(),
+                    "127.0.0.1", 0);
 
-			} catch (IOException e) {
-				/*
-				 * Try to send a notification back to the client and then close the socket.
-				 */
-				try {
-					server.sendReply(Socks5Server.ResponseCode.GENERAL_FAILURE);
-				} catch (IOException ignore) {
-				}
+            } catch (IOException e) {
+                /*
+                 * Try to send a notification back to the client and then close the socket.
+                 */
+                try {
+                    server.sendReply(Socks5Server.ResponseCode.GENERAL_FAILURE);
+                } catch (IOException ignore) {
+                }
 
-				try {
-					sock.close();
-				} catch (IOException ignore) {
-				}
+                try {
+                    sock.close();
+                } catch (IOException ignore) {
+                }
 
-				return;
-			}
+                return;
+            }
 
-			server.sendReply(Socks5Server.ResponseCode.SUCCESS);
+            server.sendReply(Socks5Server.ResponseCode.SUCCESS);
 
-			final StreamForwarder r2l = new StreamForwarder(cn, null, sock, cn.stdoutStream, out, "RemoteToLocal");
-			final StreamForwarder l2r = new StreamForwarder(cn, r2l, sock, in, cn.stdinStream, "LocalToRemote");
+            final StreamForwarder r2l = new StreamForwarder(cn, null, sock, cn.stdoutStream, out, "RemoteToLocal");
+            final StreamForwarder l2r = new StreamForwarder(cn, r2l, sock, in, cn.stdinStream, "LocalToRemote");
 
-			r2l.setDaemon(true);
-			l2r.setDaemon(true);
-			r2l.start();
-			l2r.start();
-		}
-	}
+            r2l.setDaemon(true);
+            l2r.setDaemon(true);
+            r2l.start();
+            l2r.start();
+        }
+    }
 }

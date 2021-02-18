@@ -15,69 +15,69 @@ import java.net.Socket;
  * @version $Id: StreamForwarder.java,v 1.1 2007/10/15 12:49:56 cplattne Exp $
  */
 public class StreamForwarder extends Thread {
-	final OutputStream os;
-	final InputStream is;
-	final byte[] buffer = new byte[Channel.CHANNEL_BUFFER_SIZE];
-	final Channel c;
-	final StreamForwarder sibling;
-	final Socket s;
-	final String mode;
+    final OutputStream os;
+    final InputStream is;
+    final byte[] buffer = new byte[Channel.CHANNEL_BUFFER_SIZE];
+    final Channel c;
+    final StreamForwarder sibling;
+    final Socket s;
+    final String mode;
 
-	StreamForwarder(Channel c, StreamForwarder sibling, Socket s, InputStream is, OutputStream os, String mode) {
-		this.is = is;
-		this.os = os;
-		this.mode = mode;
-		this.c = c;
-		this.sibling = sibling;
-		this.s = s;
-	}
+    StreamForwarder(Channel c, StreamForwarder sibling, Socket s, InputStream is, OutputStream os, String mode) {
+        this.is = is;
+        this.os = os;
+        this.mode = mode;
+        this.c = c;
+        this.sibling = sibling;
+        this.s = s;
+    }
 
-	public void run() {
-		try {
-			while (true) {
-				int len = is.read(buffer);
-				if (len <= 0) {
-					break;
-				}
-				os.write(buffer, 0, len);
-				os.flush();
-			}
-		} catch (IOException ignore) {
-			try {
-				c.cm.closeChannel(c, "Closed due to exception in StreamForwarder (" + mode + "): "
-					+ ignore.getMessage(), true);
-			} catch (IOException e) {
-			}
-		} finally {
-			try {
-				os.close();
-			} catch (IOException e1) {
-			}
-			try {
-				is.close();
-			} catch (IOException e2) {
-			}
+    public void run() {
+        try {
+            while (true) {
+                int len = is.read(buffer);
+                if (len <= 0) {
+                    break;
+                }
+                os.write(buffer, 0, len);
+                os.flush();
+            }
+        } catch (IOException ignore) {
+            try {
+                c.cm.closeChannel(c, "Closed due to exception in StreamForwarder (" + mode + "): "
+                    + ignore.getMessage(), true);
+            } catch (IOException e) {
+            }
+        } finally {
+            try {
+                os.close();
+            } catch (IOException e1) {
+            }
+            try {
+                is.close();
+            } catch (IOException e2) {
+            }
 
-			if (sibling != null) {
-				while (sibling.isAlive()) {
-					try {
-						sibling.join();
-					} catch (InterruptedException e) {
-					}
-				}
+            if (sibling != null) {
+                while (sibling.isAlive()) {
+                    try {
+                        sibling.join();
+                    } catch (InterruptedException e) {
+                    }
+                }
 
-				try {
-					c.cm.closeChannel(c, "StreamForwarder (" + mode + ") is cleaning up the connection", true);
-				} catch (IOException e3) {
-				}
-			}
+                try {
+                    c.cm.closeChannel(c, "StreamForwarder (" + mode + ") is cleaning up the connection", true);
+                } catch (IOException e3) {
+                }
+            }
 
-			if (s != null) {
-				try {
-					s.close();
-				} catch (IOException e1) {
-				}
-			}
-		}
-	}
+            if (s != null) {
+                try {
+                    s.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
+    }
 }

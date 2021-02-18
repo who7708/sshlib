@@ -7,5 +7,5 @@ package com.trilead.ssh2.channel;
  * @version $Id: IChannelWorkerThread.java,v 1.1 2007/10/15 12:49:56 cplattne Exp $
  */
 interface IChannelWorkerThread {
-	void stopWorking();
+    void stopWorking();
 }

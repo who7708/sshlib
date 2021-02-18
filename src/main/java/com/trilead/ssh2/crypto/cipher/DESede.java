@@ -33,84 +33,84 @@ package com.trilead.ssh2.crypto.cipher;
  * @version $Id: DESede.java,v 1.1 2007/10/15 12:49:55 cplattne Exp $
  */
 public class DESede extends DES {
-	private int[] key1 = null;
-	private int[] key2 = null;
-	private int[] key3 = null;
+    private int[] key1 = null;
+    private int[] key2 = null;
+    private int[] key3 = null;
 
-	private boolean encrypt;
+    private boolean encrypt;
 
-	/**
-	 * standard constructor.
-	 */
-	public DESede() {
-	}
+    /**
+     * standard constructor.
+     */
+    public DESede() {
+    }
 
-	/**
-	 * initialise a DES cipher.
-	 *
-	 * @param encrypting whether or not we are for encryption.
-	 * @param key        the parameters required to set up the cipher.
-	 * @throws IllegalArgumentException if the params argument is inappropriate.
-	 */
-	@Override
-	public void init(boolean encrypting, byte[] key, byte[] iv) {
-		key1 = generateWorkingKey(encrypting, key, 0);
-		key2 = generateWorkingKey(!encrypting, key, 8);
-		key3 = generateWorkingKey(encrypting, key, 16);
+    /**
+     * initialise a DES cipher.
+     *
+     * @param encrypting whether or not we are for encryption.
+     * @param key        the parameters required to set up the cipher.
+     * @throws IllegalArgumentException if the params argument is inappropriate.
+     */
+    @Override
+    public void init(boolean encrypting, byte[] key, byte[] iv) {
+        key1 = generateWorkingKey(encrypting, key, 0);
+        key2 = generateWorkingKey(!encrypting, key, 8);
+        key3 = generateWorkingKey(encrypting, key, 16);
 
-		encrypt = encrypting;
-	}
+        encrypt = encrypting;
+    }
 
-	public String getAlgorithmName() {
-		return "DESede";
-	}
+    public String getAlgorithmName() {
+        return "DESede";
+    }
 
-	@Override
-	public void transformBlock(byte[] in, int inOff, byte[] out, int outOff) {
-		if (key1 == null) {
-			throw new IllegalStateException("DESede engine not initialised!");
-		}
+    @Override
+    public void transformBlock(byte[] in, int inOff, byte[] out, int outOff) {
+        if (key1 == null) {
+            throw new IllegalStateException("DESede engine not initialised!");
+        }
 
-		if (encrypt) {
-			desFunc(key1, in, inOff, out, outOff);
-			desFunc(key2, out, outOff, out, outOff);
-			desFunc(key3, out, outOff, out, outOff);
-		} else {
-			desFunc(key3, in, inOff, out, outOff);
-			desFunc(key2, out, outOff, out, outOff);
-			desFunc(key1, out, outOff, out, outOff);
-		}
-	}
+        if (encrypt) {
+            desFunc(key1, in, inOff, out, outOff);
+            desFunc(key2, out, outOff, out, outOff);
+            desFunc(key3, out, outOff, out, outOff);
+        } else {
+            desFunc(key3, in, inOff, out, outOff);
+            desFunc(key2, out, outOff, out, outOff);
+            desFunc(key1, out, outOff, out, outOff);
+        }
+    }
 
-	private abstract static class Wrapper implements BlockCipher {
-		protected BlockCipher bc;
+    private abstract static class Wrapper implements BlockCipher {
+        protected BlockCipher bc;
 
-		@Override
-		public int getBlockSize() {
-			return bc.getBlockSize();
-		}
+        @Override
+        public int getBlockSize() {
+            return bc.getBlockSize();
+        }
 
-		@Override
-		public void transformBlock(byte[] src, int srcoff, byte[] dst, int dstoff) {
-			bc.transformBlock(src, srcoff, dst, dstoff);
-		}
-	}
+        @Override
+        public void transformBlock(byte[] src, int srcoff, byte[] dst, int dstoff) {
+            bc.transformBlock(src, srcoff, dst, dstoff);
+        }
+    }
 
-	public static class CBC extends Wrapper {
-		@Override
-		public void init(boolean forEncryption, byte[] key, byte[] iv) throws IllegalArgumentException {
-			BlockCipher rawCipher = new DESede();
-			rawCipher.init(forEncryption, key, iv);
-			bc = new CBCMode(rawCipher, iv, forEncryption);
-		}
-	}
+    public static class CBC extends Wrapper {
+        @Override
+        public void init(boolean forEncryption, byte[] key, byte[] iv) throws IllegalArgumentException {
+            BlockCipher rawCipher = new DESede();
+            rawCipher.init(forEncryption, key, iv);
+            bc = new CBCMode(rawCipher, iv, forEncryption);
+        }
+    }
 
-	public static class CTR extends Wrapper {
-		@Override
-		public void init(boolean forEncryption, byte[] key, byte[] iv) throws IllegalArgumentException {
-			BlockCipher rawCipher = new DESede();
-			rawCipher.init(true, key, iv);
-			bc = new CTRMode(rawCipher, iv, forEncryption);
-		}
-	}
+    public static class CTR extends Wrapper {
+        @Override
+        public void init(boolean forEncryption, byte[] key, byte[] iv) throws IllegalArgumentException {
+            BlockCipher rawCipher = new DESede();
+            rawCipher.init(true, key, iv);
+            bc = new CTRMode(rawCipher, iv, forEncryption);
+        }
+    }
 }

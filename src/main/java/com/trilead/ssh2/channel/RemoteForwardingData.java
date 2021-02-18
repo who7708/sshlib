@@ -7,9 +7,9 @@ package com.trilead.ssh2.channel;
  * @version $Id: RemoteForwardingData.java,v 1.1 2007/10/15 12:49:56 cplattne Exp $
  */
 public class RemoteForwardingData {
-	public String bindAddress;
-	public int bindPort;
+    public String bindAddress;
+    public int bindPort;
 
-	String targetAddress;
-	int targetPort;
+    String targetAddress;
+    int targetPort;
 }

@@ -7,50 +7,50 @@ package com.trilead.ssh2.crypto.cipher;
  * @version $Id: CTRMode.java,v 1.1 2007/10/15 12:49:55 cplattne Exp $
  */
 public class CTRMode implements BlockCipher {
-	byte[] X;
-	byte[] Xenc;
+    byte[] X;
+    byte[] Xenc;
 
-	BlockCipher bc;
-	int blockSize;
-	boolean doEncrypt;
+    BlockCipher bc;
+    int blockSize;
+    boolean doEncrypt;
 
-	int count = 0;
+    int count = 0;
 
-	public void init(boolean forEncryption, byte[] key, byte[] iv) {
-	}
+    public void init(boolean forEncryption, byte[] key, byte[] iv) {
+    }
 
-	public CTRMode(BlockCipher tc, byte[] iv, boolean doEnc) throws IllegalArgumentException {
-		bc = tc;
-		blockSize = bc.getBlockSize();
-		doEncrypt = doEnc;
+    public CTRMode(BlockCipher tc, byte[] iv, boolean doEnc) throws IllegalArgumentException {
+        bc = tc;
+        blockSize = bc.getBlockSize();
+        doEncrypt = doEnc;
 
-		if (blockSize != iv.length) {
-			throw new IllegalArgumentException("IV must be " + blockSize + " bytes long! (currently " + iv.length + ")");
-		}
+        if (blockSize != iv.length) {
+            throw new IllegalArgumentException("IV must be " + blockSize + " bytes long! (currently " + iv.length + ")");
+        }
 
-		X = new byte[blockSize];
-		Xenc = new byte[blockSize];
+        X = new byte[blockSize];
+        Xenc = new byte[blockSize];
 
-		System.arraycopy(iv, 0, X, 0, blockSize);
-	}
+        System.arraycopy(iv, 0, X, 0, blockSize);
+    }
 
-	public final int getBlockSize() {
-		return blockSize;
-	}
+    public final int getBlockSize() {
+        return blockSize;
+    }
 
-	public final void transformBlock(byte[] src, int srcoff, byte[] dst, int dstoff) {
-		bc.transformBlock(X, 0, Xenc, 0);
+    public final void transformBlock(byte[] src, int srcoff, byte[] dst, int dstoff) {
+        bc.transformBlock(X, 0, Xenc, 0);
 
-		for (int i = 0; i < blockSize; i++) {
-			dst[dstoff + i] = (byte) (src[srcoff + i] ^ Xenc[i]);
-		}
+        for (int i = 0; i < blockSize; i++) {
+            dst[dstoff + i] = (byte) (src[srcoff + i] ^ Xenc[i]);
+        }
 
-		for (int i = (blockSize - 1); i >= 0; i--) {
-			X[i]++;
-			if (X[i] != 0) {
-				break;
-			}
+        for (int i = (blockSize - 1); i >= 0; i--) {
+            X[i]++;
+            if (X[i] != 0) {
+                break;
+            }
 
-		}
-	}
+        }
+    }
 }

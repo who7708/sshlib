@@ -22,84 +22,84 @@ import java.security.spec.InvalidKeySpecException;
  * @author kenny
  */
 public class EcDhExchange extends GenericDhExchange {
-	private ECPrivateKey clientPrivate;
-	private ECPublicKey clientPublic;
-	private ECPublicKey serverPublic;
+    private ECPrivateKey clientPrivate;
+    private ECPublicKey clientPublic;
+    private ECPublicKey serverPublic;
 
-	@Override
-	public void init(String name) throws IOException {
-		final ECParameterSpec spec;
+    @Override
+    public void init(String name) throws IOException {
+        final ECParameterSpec spec;
 
-		if ("ecdh-sha2-nistp256".equals(name)) {
-			spec = ECDSASHA2Verify.ECDSASHA2NISTP256Verify.get().getParameterSpec();
-		} else if ("ecdh-sha2-nistp384".equals(name)) {
-			spec = ECDSASHA2Verify.ECDSASHA2NISTP384Verify.get().getParameterSpec();
-		} else if ("ecdh-sha2-nistp521".equals(name)) {
-			spec = ECDSASHA2Verify.ECDSASHA2NISTP521Verify.get().getParameterSpec();
-		} else {
-			throw new IllegalArgumentException("Unknown EC curve " + name);
-		}
+        if ("ecdh-sha2-nistp256".equals(name)) {
+            spec = ECDSASHA2Verify.ECDSASHA2NISTP256Verify.get().getParameterSpec();
+        } else if ("ecdh-sha2-nistp384".equals(name)) {
+            spec = ECDSASHA2Verify.ECDSASHA2NISTP384Verify.get().getParameterSpec();
+        } else if ("ecdh-sha2-nistp521".equals(name)) {
+            spec = ECDSASHA2Verify.ECDSASHA2NISTP521Verify.get().getParameterSpec();
+        } else {
+            throw new IllegalArgumentException("Unknown EC curve " + name);
+        }
 
-		KeyPairGenerator kpg;
-		try {
-			kpg = KeyPairGenerator.getInstance("EC");
-			kpg.initialize(spec);
-			KeyPair pair = kpg.generateKeyPair();
-			clientPrivate = (ECPrivateKey) pair.getPrivate();
-			clientPublic = (ECPublicKey) pair.getPublic();
-		} catch (NoSuchAlgorithmException e) {
-			throw new IOException("No DH keypair generator", e);
-		} catch (InvalidAlgorithmParameterException e) {
-			throw new IOException("Invalid DH parameters", e);
-		}
-	}
+        KeyPairGenerator kpg;
+        try {
+            kpg = KeyPairGenerator.getInstance("EC");
+            kpg.initialize(spec);
+            KeyPair pair = kpg.generateKeyPair();
+            clientPrivate = (ECPrivateKey) pair.getPrivate();
+            clientPublic = (ECPublicKey) pair.getPublic();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IOException("No DH keypair generator", e);
+        } catch (InvalidAlgorithmParameterException e) {
+            throw new IOException("Invalid DH parameters", e);
+        }
+    }
 
-	@Override
-	public byte[] getE() {
-		return ECDSASHA2Verify.encodeECPoint(clientPublic.getW(), clientPublic.getParams()
-			.getCurve());
-	}
+    @Override
+    public byte[] getE() {
+        return ECDSASHA2Verify.encodeECPoint(clientPublic.getW(), clientPublic.getParams()
+            .getCurve());
+    }
 
-	@Override
-	protected byte[] getServerE() {
-		return ECDSASHA2Verify.encodeECPoint(serverPublic.getW(), serverPublic.getParams()
-			.getCurve());
-	}
+    @Override
+    protected byte[] getServerE() {
+        return ECDSASHA2Verify.encodeECPoint(serverPublic.getW(), serverPublic.getParams()
+            .getCurve());
+    }
 
-	@Override
-	public void setF(byte[] f) throws IOException {
+    @Override
+    public void setF(byte[] f) throws IOException {
 
-		if (clientPublic == null) {
-			throw new IllegalStateException("DhDsaExchange not initialized!");
-		}
+        if (clientPublic == null) {
+            throw new IllegalStateException("DhDsaExchange not initialized!");
+        }
 
-		final KeyAgreement ka;
-		try {
-			KeyFactory kf = KeyFactory.getInstance("EC");
-			ECDSASHA2Verify verifier = ECDSASHA2Verify.getVerifierForKey(clientPublic);
-			if (verifier == null) {
-				throw new IOException("No such EC group");
-			}
+        final KeyAgreement ka;
+        try {
+            KeyFactory kf = KeyFactory.getInstance("EC");
+            ECDSASHA2Verify verifier = ECDSASHA2Verify.getVerifierForKey(clientPublic);
+            if (verifier == null) {
+                throw new IOException("No such EC group");
+            }
 
-			ECPoint serverPoint = verifier.decodeECPoint(f);
-			ECParameterSpec params = verifier.getParameterSpec();
-			this.serverPublic = (ECPublicKey) kf.generatePublic(new ECPublicKeySpec(serverPoint,
-				params));
+            ECPoint serverPoint = verifier.decodeECPoint(f);
+            ECParameterSpec params = verifier.getParameterSpec();
+            this.serverPublic = (ECPublicKey) kf.generatePublic(new ECPublicKeySpec(serverPoint,
+                params));
 
-			ka = KeyAgreement.getInstance("ECDH");
-			ka.init(clientPrivate);
-			ka.doPhase(serverPublic, true);
-		} catch (NoSuchAlgorithmException e) {
-			throw new IOException("No ECDH key agreement method", e);
-		} catch (InvalidKeyException | InvalidKeySpecException e) {
-			throw new IOException("Invalid ECDH key", e);
-		}
+            ka = KeyAgreement.getInstance("ECDH");
+            ka.init(clientPrivate);
+            ka.doPhase(serverPublic, true);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IOException("No ECDH key agreement method", e);
+        } catch (InvalidKeyException | InvalidKeySpecException e) {
+            throw new IOException("Invalid ECDH key", e);
+        }
 
-		sharedSecret = new BigInteger(1, ka.generateSecret());
-	}
+        sharedSecret = new BigInteger(1, ka.generateSecret());
+    }
 
-	@Override
-	public String getHashAlgo() {
-		return ECDSASHA2Verify.getDigestAlgorithmForParams(clientPublic);
-	}
+    @Override
+    public String getHashAlgo() {
+        return ECDSASHA2Verify.getDigestAlgorithmForParams(clientPublic);
+    }
 }

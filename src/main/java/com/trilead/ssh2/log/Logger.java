@@ -17,34 +17,34 @@ import com.trilead.ssh2.DebugLogger;
  */
 
 public class Logger {
-	public static boolean enabled = false;
-	public static DebugLogger logger = null;
+    public static boolean enabled = false;
+    public static DebugLogger logger = null;
 
-	private final String className;
+    private final String className;
 
-	public final static Logger getLogger(Class x) {
-		return new Logger(x);
-	}
+    public final static Logger getLogger(Class x) {
+        return new Logger(x);
+    }
 
-	public Logger(Class x) {
-		this.className = x.getName();
-	}
+    public Logger(Class x) {
+        this.className = x.getName();
+    }
 
-	public final boolean isEnabled() {
-		return enabled;
-	}
+    public final boolean isEnabled() {
+        return enabled;
+    }
 
-	public final void log(int level, String message) {
-		if (!enabled) {
-			return;
-		}
+    public final void log(int level, String message) {
+        if (!enabled) {
+            return;
+        }
 
-		DebugLogger target = logger;
+        DebugLogger target = logger;
 
-		if (target == null) {
-			return;
-		}
+        if (target == null) {
+            return;
+        }
 
-		target.log(level, className, message);
-	}
+        target.log(level, className, message);
+    }
 }
